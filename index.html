@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Jodyub</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ───────── TOKENS ───────── */
+:root {
+  --bg:#0d0d2b; --surface:#13133a; --surface2:#1a1a4a; --surface3:#1e1e5a;
+  --border:#1e1e4a; --border2:rgba(192,240,0,0.15);
+  --text:#ffffff; --text2:#c9d1d9; --muted:#6b7280;
+  --blue:#8b5cf6; --green:#c0f000; --red:#f85149;
+  --orange:#f0a500; --purple:#8b5cf6; --pink:#f472b6; --cyan:#39d3f2;
+  --blue-glow:rgba(139,92,246,.15); --green-glow:rgba(192,240,0,.12);
+  --accent:#c0f000; --accent-dark:#0d0d2b;
+  --font:'IBM Plex Sans Thai',sans-serif;
+  --radius:12px; --radius-sm:8px; --radius-lg:18px;
+  --nav-h:60px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;display:flex;flex-direction:column}
+
+/* ───────── SCREEN SYSTEM ───────── */
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen.active{display:flex}
+
+/* ══════════════════════════════════
+   LANDING SCREEN
+══════════════════════════════════ */
+#s-landing{align-items:center;justify-content:center;padding:24px;background:var(--bg)}
+#s-landing::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(192,240,0,.06) 0%,rgba(139,92,246,.06) 50%,transparent 70%);
+  pointer-events:none
+}
+.land-inner{width:100%;max-width:380px;animation:fadeUp .5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.land-logo{text-align:center;margin-bottom:36px}
+.land-logo-icon{
+  width:72px;height:72px;border-radius:22px;
+  background:linear-gradient(135deg,var(--purple),var(--accent));
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:32px;margin-bottom:14px;
+  box-shadow:0 0 40px rgba(192,240,0,.25),0 0 20px rgba(139,92,246,.2)
+}
+.land-logo h1{font-size:26px;font-weight:700;letter-spacing:-.5px}
+.land-logo h1 span{color:var(--accent)}
+.land-logo p{font-size:13px;color:var(--muted);margin-top:4px}
+
+.land-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:20px;margin-bottom:12px
+}
+.land-card-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px}
+
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px 20px;border-radius:var(--radius-sm);border:none;
+  font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s
+}
+.btn-primary{background:var(--accent);color:var(--accent-dark);box-shadow:0 4px 20px rgba(192,240,0,.2);font-weight:700}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:active{background:var(--surface3)}
+
+.code-input{
+  width:100%;padding:14px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-family:'Courier New',monospace;
+  font-size:22px;font-weight:700;letter-spacing:5px;text-align:center;text-transform:uppercase;
+  outline:none;transition:all .2s;margin-bottom:10px
+}
+.code-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+
+/* ══════════════════════════════════
+   SETUP SCREEN
+══════════════════════════════════ */
+#s-setup{background:var(--bg);overflow-y:auto}
+.setup-wrap{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+.setup-back{
+  display:inline-flex;align-items:center;gap:6px;background:none;border:none;
+  color:var(--muted);font-family:var(--font);font-size:13px;cursor:pointer;
+  padding:0;margin-bottom:20px
+}
+.setup-back:hover{color:var(--text)}
+.setup-head{margin-bottom:24px}
+.setup-head h2{font-size:20px;font-weight:700}
+.setup-head p{font-size:13px;color:var(--muted);margin-top:4px}
+
+.step-dots{display:flex;gap:6px;margin-bottom:24px}
+.sdot-step{height:4px;border-radius:2px;background:var(--border);transition:all .3s}
+.sdot-step.active{background:var(--accent);width:24px}
+.sdot-step.done{background:var(--accent)}
+.sdot-step:not(.active):not(.done){width:8px}
+.sdot-step.active{width:24px}
+
+.step-page{display:none;animation:fadeUp .3s ease}
+.step-page.active{display:block}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+input,select,textarea{
+  width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:all .2s
+}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+input::placeholder{color:var(--muted)}
+select option{background:var(--surface2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* traveler chips */
+.traveler-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.traveler-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm)
+}
+.t-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.t-name{flex:1;font-size:14px;font-weight:500}
+.t-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px;border-radius:4px;transition:color .2s}
+.t-del:hover{color:var(--red)}
+.add-row{display:flex;gap:8px}
+.add-row input{flex:1}
+.btn-icon{
+  padding:11px 14px;background:var(--surface3);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--blue);cursor:pointer;font-size:18px;transition:all .2s
+}
+.btn-icon:hover{background:var(--blue-glow)}
+
+/* currency chips */
+.cur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.cur-chip{
+  padding:10px 6px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);cursor:pointer;text-align:center;transition:all .2s;
+  font-size:12px;font-weight:500
+}
+.cur-chip.on{background:var(--blue-glow);border-color:var(--accent);color:var(--accent)}
+
+/* extra cat chips */
+.extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.extra-chip{
+  padding:12px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);cursor:pointer;text-align:center;transition:all .2s
+}
+.extra-chip .ec-icon{font-size:22px;margin-bottom:4px}
+.extra-chip .ec-name{font-size:12px;font-weight:600}
+.extra-chip .ec-desc{font-size:10px;color:var(--muted);margin-top:2px}
+.extra-chip.on{border-color:var(--pink);background:rgba(244,114,182,.1)}
+
+.default-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.def-chip{
+  padding:5px 10px;background:var(--surface3);border:1px solid var(--border);
+  border-radius:20px;font-size:11px;color:var(--muted)
+}
+
+.step-nav{display:flex;gap:10px;margin-top:20px}
+.btn-back-step{padding:13px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);cursor:pointer;font-size:18px;flex-shrink:0;transition:all .2s}
+.btn-back-step:active{background:var(--surface3)}
+
+/* ══════════════════════════════════
+   APP SCREEN
+══════════════════════════════════ */
+#s-app{background:var(--bg)}
+
+/* HEADER */
+.app-hd{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:14px 16px 0;flex-shrink:0
+}
+.app-hd-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.app-title h2{font-size:16px;font-weight:700}
+.app-title .dest{font-size:11px;color:var(--muted);margin-top:2px}
+.code-badge{
+  font-family:'Courier New',monospace;font-size:10px;font-weight:700;
+  letter-spacing:1.5px;padding:3px 8px;background:var(--surface2);
+  border:1px solid var(--purple);border-radius:6px;color:var(--purple);
+  cursor:pointer;transition:all .2s;margin-top:2px;display:inline-block
+}
+.code-badge:hover{background:var(--blue-glow)}
+.status-pill{
+  display:flex;align-items:center;gap:5px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:20px;padding:4px 10px;
+  font-size:11px;color:var(--muted);flex-shrink:0
+}
+.s-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:background .3s;flex-shrink:0}
+.s-dot.live{background:var(--accent);animation:blink 2s infinite}
+.s-dot.err{background:var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* SUMMARY STRIP */
+.sum-strip{
+  display:grid;gap:1px;background:var(--border);border-top:1px solid var(--border);
+  flex-shrink:0
+}
+.sum-cell{background:var(--surface);padding:10px 12px;text-align:center}
+.sum-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.sum-value{font-size:17px;font-weight:700}
+.sum-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* CUR TOGGLE in strip */
+.cur-toggle-btn{
+  background:var(--surface2);border:1px solid var(--purple);border-radius:6px;
+  color:var(--purple);font-family:var(--font);font-size:10px;font-weight:700;
+  padding:4px 8px;cursor:pointer;white-space:nowrap;transition:all .2s;align-self:center
+}
+.cur-toggle-btn.active{background:var(--blue-glow);border-color:var(--purple)}
+
+/* TAB BAR */
+.tab-bar{
+  display:flex;background:var(--border);gap:1px;
+  border-bottom:1px solid var(--border);flex-shrink:0
+}
+.tab-btn{
+  flex:1;padding:10px 4px;background:var(--surface);border:none;
+  color:var(--muted);font-family:var(--font);font-size:11px;font-weight:600;
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-align:center
+}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface)}
+.tab-btn:hover:not(.active){color:var(--text2)}
+
+/* TAB CONTENTS */
+.tab-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.tab-pane{display:none;padding:16px}
+.tab-pane.active{display:block}
+
+/* ── ADD TAB ── */
+.add-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px}
+.add-card-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.add-top-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+
+.cat-grid-app{display:grid;gap:6px;margin-bottom:4px}
+.cat-btn-app{
+  padding:9px 6px;background:var(--surface2);border:2px solid transparent;
+  border-radius:var(--radius-sm);cursor:pointer;text-align:center;transition:all .2s
+}
+.cat-btn-app .ci{font-size:18px;display:block;margin-bottom:2px}
+.cat-btn-app .cl{font-size:10px;font-weight:600;color:var(--muted)}
+.cat-btn-app.on .cl{color:inherit}
+
+.payer-row{display:flex;gap:8px;flex-wrap:wrap}
+.payer-chip{
+  display:flex;align-items:center;gap:6px;padding:7px 12px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:20px;
+  cursor:pointer;font-size:13px;font-weight:500;transition:all .2s
+}
+.payer-chip.on{border-width:2px}
+.payer-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+.pay-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pay-btn{
+  padding:9px 6px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--muted);cursor:pointer;font-size:11px;
+  font-weight:600;text-align:center;transition:all .2s
+}
+.pay-btn.on{border-color:var(--green);background:var(--green-glow);color:var(--green)}
+
+.field-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:14px}
+.field-label:first-of-type{margin-top:0}
+
+.amount-row{display:flex;gap:8px}
+.amount-row input{flex:1}
+.amount-row select{width:90px;flex-shrink:0}
+
+/* ── LIST TAB ── */
+.day-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none}
+.day-scroll::-webkit-scrollbar{display:none}
+.day-chip-filter{
+  padding:6px 12px;background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;font-size:12px;font-weight:500;color:var(--muted);
+  cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s
+}
+.day-chip-filter.active{background:var(--blue-glow);border-color:var(--accent);color:var(--accent)}
+
+.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.list-title{font-size:13px;font-weight:700}
+.list-count{font-size:12px;color:var(--muted)}
+
+.expense-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;
+  animation:fadeUp .2s ease
+}
+.e-day-badge{
+  width:36px;height:36px;border-radius:10px;background:var(--surface3);
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  font-weight:700;color:var(--muted);flex-shrink:0;font-family:'Courier New',monospace
+}
+.e-body{flex:1;min-width:0}
+.e-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.e-tags{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
+.e-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px}
+.e-note{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.e-right{text-align:right;flex-shrink:0}
+.e-amt{font-size:14px;font-weight:700}
+.e-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.e-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:6px;border-radius:6px;transition:all .2s;margin-left:4px}
+.e-del:hover{color:var(--red);background:rgba(248,81,73,.1)}
+
+.day-divider{
+  font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.5px;
+  padding:12px 0 6px;display:flex;align-items:center;gap:8px
+}
+.day-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:40px;margin-bottom:10px}
+.empty p{font-size:13px}
+
+/* ── SUMMARY TAB ── */
+.sum-section-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px}
+.sum-section-title:first-child{margin-top:0}
+
+/* rate card */
+.rate-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px}
+.rate-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.rate-label{font-size:12px;font-weight:700;color:var(--orange);width:40px;flex-shrink:0}
+.rate-eq{font-size:12px;color:var(--muted);flex:1}
+.rate-inp{flex:0 0 100px;padding:8px 10px;text-align:right;font-family:'Courier New',monospace;font-size:13px}
+.rate-unit{font-size:11px;color:var(--muted);flex-shrink:0;width:36px}
+.rate-reset{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:4px;border-radius:4px;transition:color .2s}
+.rate-reset.edited{color:var(--orange)}
+.rate-hint{font-size:10px;color:var(--muted)}
+
+/* chart */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:8px}
+.chart-inner{display:flex;align-items:center;gap:16px}
+.chart-canvas-wrap{width:130px;height:130px;flex-shrink:0}
+.chart-legend{flex:1}
+.legend-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:12px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:6px}
+.legend-name{flex:1;color:var(--text2)}
+.legend-pct{font-weight:700;margin-right:6px}
+.legend-val{color:var(--muted)}
+
+/* payer cards */
+.payer-card-sum{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px
+}
+.p-av-big{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.p-info{flex:1}
+.p-name{font-size:15px;font-weight:600}
+.p-count{font-size:11px;color:var(--muted);margin-top:2px}
+.p-total{text-align:right}
+.p-main{font-size:15px;font-weight:700}
+.p-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* cat accordion */
+.cat-acc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+.cat-acc-hd{
+  display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;transition:background .2s
+}
+.cat-acc-hd:hover{background:var(--surface2)}
+.cat-acc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cat-acc-name{flex:1;font-size:13px;font-weight:600}
+.cat-acc-pct{font-size:11px;color:var(--muted);margin-right:8px}
+.cat-acc-amt{font-size:13px;font-weight:700;margin-right:8px}
+.cat-acc-arr{font-size:10px;color:var(--muted);transition:transform .2s}
+.cat-acc.open .cat-acc-arr{transform:rotate(180deg)}
+.cat-acc-body{display:none;border-top:1px solid var(--border);padding:8px 14px}
+.cat-acc.open .cat-acc-body{display:block}
+.cat-acc-item{padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.cat-acc-item:last-child{border-bottom:none}
+.acc-day{font-size:10px;font-weight:700;color:var(--muted);width:24px;flex-shrink:0;font-family:'Courier New',monospace}
+.acc-name{flex:1;font-size:12px;font-weight:500}
+.acc-amt{font-size:12px;font-weight:700;text-align:right}
+
+/* day bars */
+.day-bar{margin-bottom:10px}
+.day-bar-hd{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.day-bar-lbl{color:var(--text2)}
+.day-bar-val{font-weight:700}
+.day-bar-track{height:6px;background:var(--surface3);border-radius:3px}
+.day-bar-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .5s}
+
+/* ── MODALS ── */
+.modal-bg{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)
+}
+.modal-bg.open{display:flex}
+.modal-box{
+  background:var(--surface);border:1px solid var(--border2);border-radius:20px;
+  padding:28px;max-width:340px;width:100%;text-align:center;animation:fadeUp .25s ease
+}
+.modal-code{
+  font-family:'Courier New',monospace;font-size:30px;font-weight:700;
+  letter-spacing:6px;color:var(--blue);padding:16px;background:var(--surface2);
+  border-radius:var(--radius);margin:14px 0;border:1px solid var(--border2)
+}
+.modal-hint{font-size:12px;color:var(--muted);margin-bottom:18px}
+.modal-btn{
+  padding:10px 20px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);cursor:pointer;font-family:var(--font);
+  font-size:13px;font-weight:600;transition:all .2s;margin:4px
+}
+.modal-btn:hover{background:var(--surface3)}
+
+/* ── TOAST ── */
+#toast-wrap{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:300;pointer-events:none}
+.toast{
+  background:var(--surface3);border:1px solid var(--border2);color:var(--text);
+  padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;
+  white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4);
+  animation:toastIn .25s ease;margin-bottom:6px
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── RESPONSIVE ── */
+@media(min-width:768px){
+  .tab-body{display:grid;grid-template-columns:400px 1fr;gap:0;align-items:start;overflow:hidden}
+  .tab-pane{display:block !important;overflow-y:auto;height:100%}
+  .tab-bar{display:none}
+  .cur-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:380px){
+  .cat-grid-app{grid-template-columns:repeat(3,1fr)}
+  .sum-value{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LANDING ══ -->
+<div id="s-landing" class="screen active">
+  <div class="land-inner">
+    <div class="land-logo">
+      <div class="land-logo-icon">
+        <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- wallet body -->
+          <rect x="2" y="11" width="22" height="15" rx="3" fill="#0d0d2b" stroke="#c0f000" stroke-width="1.8"/>
+          <rect x="2" y="11" width="22" height="6" rx="3" fill="#c0f00025" stroke="#c0f000" stroke-width="1.5"/>
+          <circle cx="20" cy="19" r="2.2" fill="#c0f000"/>
+          <!-- calculator -->
+          <rect x="21" y="19" width="15" height="17" rx="2.5" fill="#1a1a4a" stroke="#8b5cf6" stroke-width="1.6"/>
+          <rect x="23" y="21" width="11" height="4" rx="1" fill="#8b5cf630"/>
+          <text x="24" y="24.5" font-family="monospace" font-size="3.8" fill="#c0f000" font-weight="bold">123</text>
+          <rect x="23" y="27" width="3" height="2" rx=".5" fill="#8b5cf6" opacity=".8"/>
+          <rect x="27" y="27" width="3" height="2" rx=".5" fill="#8b5cf6" opacity=".8"/>
+          <rect x="31" y="27" width="3" height="2" rx=".5" fill="#c0f000"/>
+          <rect x="23" y="30.5" width="3" height="2" rx=".5" fill="#8b5cf6" opacity=".8"/>
+          <rect x="27" y="30.5" width="3" height="2" rx=".5" fill="#8b5cf6" opacity=".8"/>
+          <rect x="31" y="30.5" width="3" height="2" rx=".5" fill="#c0f000"/>
+        </svg>
+      </div>
+      <h1>Jodyub</h1>
+      <p>Track & split travel expenses</p>
+    </div>
+
+    <div class="land-card">
+      <div class="land-card-title">🆕 สร้างทริปใหม่</div>
+      <button class="btn btn-primary" id="btn-new-trip">➕ สร้างทริปใหม่</button>
+    </div>
+
+    <div class="land-card">
+      <div class="land-card-title">🔑 เข้าร่วมทริป</div>
+      <input class="code-input" id="join-input" type="text" maxlength="6" placeholder="XXXXXX">
+      <button class="btn btn-secondary" id="btn-join">🚀 เข้าร่วม</button>
+    </div>
+
+    <!-- recent trips -->
+    <div id="recent-trips-wrap" class="land-card" style="display:none"></div>
+
+    <!-- counter ล่างสุด subtle -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%">
+      <span style="font-size:13px">🗺️</span>
+      <span style="font-size:11px;color:var(--muted)">ทริปที่สร้างไปแล้ว</span>
+      <span id="trip-counter" style="font-size:12px;font-weight:700;color:var(--muted)">24 ทริป</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETUP ══ -->
+<div id="s-setup" class="screen">
+  <div class="setup-wrap">
+    <button class="setup-back" id="setup-back">← กลับ</button>
+    <div class="setup-head">
+      <h2>สร้างทริปใหม่</h2>
+      <p>ตั้งค่าทริปของคุณ</p>
+    </div>
+    <div class="step-dots" id="step-dots"></div>
+
+    <!-- Step 0: Trip info -->
+    <div class="step-page active" id="sp-0">
+      <div class="field"><label>ชื่อทริป</label>
+        <input id="s-name" type="text" placeholder="เช่น Korea Trip 2026 🇰🇷">
+      </div>
+      <div class="grid2">
+        <div class="field"><label>วันเริ่มต้น</label><input id="s-start" type="date"></div>
+        <div class="field"><label>วันสิ้นสุด</label><input id="s-end" type="date"></div>
+      </div>
+      <div class="field"><label>จุดหมาย</label>
+        <input id="s-dest" type="text" placeholder="เช่น South Korea 🇰🇷">
+      </div>
+      <button class="btn btn-primary" id="sp0-next">ถัดไป →</button>
+    </div>
+
+    <!-- Step 1: Travelers -->
+    <div class="step-page" id="sp-1">
+      <div class="field"><label>ผู้เดินทาง</label>
+        <div class="traveler-list" id="traveler-list"></div>
+        <div class="add-row">
+          <input id="traveler-inp" type="text" placeholder="ชื่อผู้เดินทาง">
+          <button class="btn-icon" id="traveler-add">+</button>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back-step" id="sp1-prev">←</button>
+        <button class="btn btn-primary" id="sp1-next">ถัดไป →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Currencies -->
+    <div class="step-page" id="sp-2">
+      <div class="field"><label>สกุลเงิน (เลือกได้หลายอัน)</label>
+        <div class="cur-grid" id="cur-grid">
+          <div class="cur-chip on" data-cur="THB">🇹🇭 THB</div>
+          <div class="cur-chip" data-cur="KRW">🇰🇷 KRW</div>
+          <div class="cur-chip" data-cur="JPY">🇯🇵 JPY</div>
+          <div class="cur-chip" data-cur="USD">🇺🇸 USD</div>
+          <div class="cur-chip" data-cur="EUR">🇪🇺 EUR</div>
+          <div class="cur-chip" data-cur="GBP">🇬🇧 GBP</div>
+          <div class="cur-chip" data-cur="CNY">🇨🇳 CNY</div>
+          <div class="cur-chip" data-cur="SGD">🇸🇬 SGD</div>
+        </div>
+      </div>
+      <div class="field"><label>แสดงผลเป็น (Base Currency)</label>
+        <select id="s-base">
+          <option value="THB">THB — บาทไทย</option>
+          <option value="USD">USD — US Dollar</option>
+        </select>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back-step" id="sp2-prev">←</button>
+        <button class="btn btn-primary" id="sp2-next">ถัดไป →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Extra categories -->
+    <div class="step-page" id="sp-3">
+      <div class="field">
+        <label>หมวดหลัก (มีให้ทุกทริป)</label>
+        <div class="default-cats">
+          <div class="def-chip">🍜 Food & Drink</div>
+          <div class="def-chip">🛍 Shopping</div>
+          <div class="def-chip">🎁 Souvenir</div>
+          <div class="def-chip">🚌 Transport</div>
+          <div class="def-chip">🏨 Accommodation</div>
+          <div class="def-chip">🎡 Activity</div>
+          <div class="def-chip">📦 Other</div>
+        </div>
+        <label style="margin-top:14px;">หมวดพิเศษ (ไม่บังคับ)</label>
+        <div class="extra-grid" id="extra-grid">
+          <div class="extra-chip" data-cat="aesthetic">
+            <div class="ec-icon">💉</div>
+            <div class="ec-name">Aesthetic Clinic</div>
+            <div class="ec-desc">โบท็อก ฟิลเลอร์ คลินิก</div>
+          </div>
+          <div class="extra-chip" data-cat="snack">
+            <div class="ec-icon">🍿</div>
+            <div class="ec-name">Snack & Street</div>
+            <div class="ec-desc">ของกินเล่น ตลาด</div>
+          </div>
+          <div class="extra-chip" data-cat="entertainment">
+            <div class="ec-icon">🎰</div>
+            <div class="ec-name">Entertainment</div>
+            <div class="ec-desc">คอนเสิร์ต บาร์</div>
+          </div>
+          <div class="extra-chip" data-cat="outdoor">
+            <div class="ec-icon">⛷️</div>
+            <div class="ec-name">Outdoor</div>
+            <div class="ec-desc">ธรรมชาติ ผจญภัย</div>
+          </div>
+          <div class="extra-chip" data-cat="photobooth">
+            <div class="ec-icon">📸</div>
+            <div class="ec-name">Photo Booth</div>
+            <div class="ec-desc">ถ่ายรูป สตูดิโอ</div>
+          </div>
+          <div class="extra-chip" data-cat="health">
+            <div class="ec-icon">💊</div>
+            <div class="ec-name">Health</div>
+            <div class="ec-desc">ยา หมอ ประกัน</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back-step" id="sp3-prev">←</button>
+        <button class="btn btn-primary" id="btn-create-trip">🚀 สร้างทริป!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="s-app" class="screen">
+
+  <!-- header -->
+  <div class="app-hd" id="app-hd">
+    <div class="app-hd-top">
+      <div class="app-title">
+        <h2 id="app-name">—</h2>
+        <div><span class="code-badge" id="app-code" title="คลิกดู Trip Code">●●●●●●</span></div>
+      </div>
+      <div class="status-pill" id="status-pill">
+        <div class="s-dot" id="s-dot"></div>
+        <span id="s-txt">localStorage</span>
+      </div>
+    </div>
+
+    <!-- summary strip -->
+    <div class="sum-strip" id="sum-strip">
+      <!-- rendered by JS -->
+    </div>
+
+    <!-- tab bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="add">➕ เพิ่ม</button>
+      <button class="tab-btn" data-tab="list">📋 รายการ</button>
+      <button class="tab-btn" data-tab="summary">📊 สรุป</button>
+    </div>
+  </div>
+
+  <!-- tab body -->
+  <div class="tab-body">
+
+    <!-- ADD -->
+    <div class="tab-pane active" id="tab-add">
+      <div class="add-card">
+        <div class="add-card-title">🧾 เพิ่มค่าใช้จ่าย</div>
+
+        <div class="add-top-row">
+          <div>
+            <div class="field-label">วัน</div>
+            <select id="f-day"></select>
+          </div>
+          <div>
+            <div class="field-label">สกุลเงิน</div>
+            <select id="f-cur"></select>
+          </div>
+        </div>
+
+        <div class="field-label">หมวดหมู่</div>
+        <div class="cat-grid-app" id="cat-grid-app"></div>
+
+        <div class="field-label">รายการ</div>
+        <input id="f-name" type="text" placeholder="เช่น ซัมกยอปซัล · ช้อปปิ้ง Myeongdong...">
+
+        <div class="field-label">จำนวนเงิน</div>
+        <div class="amount-row">
+          <input id="f-amount" type="number" placeholder="0" min="0" inputmode="decimal">
+          <select id="f-cur2"></select>
+        </div>
+
+        <div class="field-label">ผู้จ่าย</div>
+        <div class="payer-row" id="payer-row"></div>
+
+        <div class="field-label">วิธีชำระ</div>
+        <div class="pay-row" id="pay-row">
+          <div class="pay-btn on" data-pay="cash">💵 เงินสด</div>
+          <div class="pay-btn" data-pay="card">💳 บัตรเครดิต</div>
+          <div class="pay-btn" data-pay="travel">🪙 Travel Card</div>
+        </div>
+
+        <div class="field-label">หมายเหตุ (ไม่บังคับ)</div>
+        <input id="f-note" type="text" placeholder="รายละเอียดเพิ่มเติม...">
+
+        <button class="btn btn-primary" id="btn-add" style="margin-top:18px;">✅ บันทึก</button>
+      </div>
+    </div>
+
+    <!-- LIST -->
+    <div class="tab-pane" id="tab-list">
+      <div class="day-scroll" id="day-scroll"></div>
+      <div class="list-header">
+        <div class="list-title">รายการ</div>
+        <div class="list-count" id="list-count">0 รายการ</div>
+      </div>
+      <div id="expense-list"></div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="tab-pane" id="tab-summary">
+
+      <div class="sum-section-title">💱 อัตราแลกเปลี่ยน</div>
+      <div id="rates-wrap"></div>
+
+      <div class="sum-section-title">🍩 ภาพรวมทั้งทริป</div>
+      <div class="chart-wrap">
+        <div class="chart-inner">
+          <div class="chart-canvas-wrap"><canvas id="donut-chart"></canvas></div>
+          <div class="chart-legend" id="chart-legend"></div>
+        </div>
+      </div>
+
+      <div class="sum-section-title">สรุปแยกหมวดหมู่</div>
+      <div id="cat-accordion"></div>
+
+      <div class="sum-section-title">👤 สรุปตามผู้จ่าย</div>
+      <div id="payer-sum"></div>
+
+      <div class="sum-section-title">📅 แบ่งตามวัน</div>
+      <div id="day-bars"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CODE MODAL -->
+<div class="modal-bg" id="code-modal">
+  <div class="modal-box">
+    <div style="font-size:32px;margin-bottom:8px">🔑</div>
+    <div style="font-size:17px;font-weight:700;margin-bottom:4px">Trip Code</div>
+    <div class="modal-hint">แชร์ให้เพื่อนในทริปเพื่อเข้าร่วม</div>
+    <div class="modal-code" id="modal-code-txt">——</div>
+    <div class="modal-hint">กรอก code ที่หน้าแรกเพื่อเข้าร่วมทริปเดียวกัน</div>
+    <button class="modal-btn" id="modal-copy">📋 คัดลอก</button>
+    <button class="modal-btn" id="modal-close">ปิด</button>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+// ══════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════
+var AVATAR_COLORS = ['#58a6ff','#3fb950','#f0a500','#f472b6','#bc8cff','#39d3f2','#f85149'];
+var DEFAULT_RATES = {THB:1,KRW:0.026,JPY:0.24,USD:36,EUR:39,GBP:46,CNY:5,SGD:27};
+var DEFAULT_CATS  = ['food','shopping','souvenir','transport','accommodation','activity','other'];
+
+var ALL_CATS = {
+  food:          {emoji:'🍜',label:'Food & Drink',     color:'#3fb950'},
+  shopping:      {emoji:'🛍',label:'Shopping',         color:'#bc8cff'},
+  souvenir:      {emoji:'🎁',label:'Souvenir',         color:'#f472b6'},
+  transport:     {emoji:'🚌',label:'Transport',        color:'#58a6ff'},
+  accommodation: {emoji:'🏨',label:'Accommodation',    color:'#f0a500'},
+  activity:      {emoji:'🎡',label:'Activity',         color:'#39d3f2'},
+  other:         {emoji:'📦',label:'Other',            color:'#7d8590'},
+  aesthetic:     {emoji:'💉',label:'Aesthetic Clinic', color:'#f472b6'},
+  snack:         {emoji:'🍿',label:'Snack & Street',   color:'#f0a500'},
+  entertainment: {emoji:'🎰',label:'Entertainment',    color:'#bc8cff'},
+  outdoor:       {emoji:'⛷️',label:'Outdoor',          color:'#3fb950'},
+  photobooth:    {emoji:'📸',label:'Photo Booth',      color:'#39d3f2'},
+  health:        {emoji:'💊',label:'Health',           color:'#f85149'},
+};
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+var trip       = null;
+var expenses   = [];
+var customRates= {};
+var selCat     = '';
+var selPayer   = '';
+var selPay     = 'cash';
+var filterDay  = 'all';
+var showBase   = false;   // false = trip currency, true = base (THB)
+var setupStep  = 0;
+var setupData  = {travelers:[],currencies:['THB'],extraCats:[],base:'THB'};
+var donutChart = null;
+
+// ══════════════════════════════════════
+// FIREBASE INIT
+// ══════════════════════════════════════
+var firebaseConfig = {
+  apiKey: "AIzaSyCEf_D8eQxBsB_URqHe1nc8GWIO6kf_KMQ",
+  authDomain: "jodyub-842bd.firebaseapp.com",
+  databaseURL: "https://jodyub-842bd-default-rtdb.firebaseio.com",
+  projectId: "jodyub-842bd",
+  storageBucket: "jodyub-842bd.firebasestorage.app",
+  messagingSenderId: "389947844606",
+  appId: "1:389947844606:web:5c7cca4e97bb4120bb82af"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
+
+// ══════════════════════════════════════
+// COUNTER (Firebase real counter)
+// ══════════════════════════════════════
+function initCounter(){
+  db.ref('counter').on('value', function(snap){
+    var n = snap.val() || 24;
+    var el = document.getElementById('trip-counter');
+    if(el) el.textContent = n.toLocaleString() + ' ทริป';
+  });
+}
+function incCounter(){
+  db.ref('counter').transaction(function(n){ return (n||24)+1; });
+}
+initCounter();
+
+// ══════════════════════════════════════
+// DB (Firebase)
+// ══════════════════════════════════════
+function saveTrip(){
+  db.ref('trips/'+trip.code).set(trip);
+}
+function saveExpenses(){
+  db.ref('trips/'+trip.code+'/expenses').set(expenses);
+}
+function saveRates(){
+  db.ref('trips/'+trip.code+'/rates').set(customRates);
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function genCode(){
+  var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';
+  for(var i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];
+  return s;
+}
+function fmt(n,cur){
+  var sym={THB:'฿',USD:'$',EUR:'€',GBP:'£',JPY:'¥',KRW:'₩',CNY:'¥',SGD:'S$'};
+  return (sym[cur]||cur+' ')+(n||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+function getRate(cur){
+  if(cur===trip.baseCurrency)return 1;
+  return customRates[cur]!==undefined?customRates[cur]:(DEFAULT_RATES[cur]||1);
+}
+function toBase(amount,cur){return amount*getRate(cur)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function buildDays(){
+  var days=[];
+  if(trip.dateStart&&trip.dateEnd){
+    var s=new Date(trip.dateStart),e=new Date(trip.dateEnd),c=new Date(s),i=1;
+    while(c<=e){
+      days.push({key:'day'+i,label:'Day '+i+' · '+c.toLocaleDateString('th-TH',{day:'numeric',month:'short'})});
+      c.setDate(c.getDate()+1);i++;
+    }
+  }
+  if(!days.length)for(var j=1;j<=7;j++)days.push({key:'day'+j,label:'Day '+j});
+  return days;
+}
+function tripCurs(){return(trip.currencies||[]).filter(function(c){return c!==trip.baseCurrency})}
+
+// ══════════════════════════════════════
+// SCREEN SWITCH
+// ══════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════════════════════
+// LANDING
+// ══════════════════════════════════════
+document.getElementById('btn-new-trip').addEventListener('click',function(){
+  setupStep=0;
+  setupData={travelers:[],currencies:['THB'],extraCats:[],base:'THB'};
+  renderSetupDots();renderTravelerList();
+  showScreen('s-setup');
+});
+
+document.getElementById('btn-join').addEventListener('click',function(){
+  var code=document.getElementById('join-input').value.trim().toUpperCase();
+  if(!code){toast('⚠️ กรุณากรอก Trip Code');return}
+  var btn=document.getElementById('btn-join');
+  btn.textContent='⏳ กำลังโหลด...';btn.disabled=true;
+  db.ref('trips/'+code).once('value').then(function(snap){
+    btn.textContent='🚀 เข้าร่วม';btn.disabled=false;
+    if(!snap.exists()){toast('❌ ไม่พบทริป: '+code);return}
+    trip=snap.val();
+    expenses=trip.expenses||[];
+    customRates=trip.rates||{};
+    // save to recent trips
+    saveRecentTrip(code);
+    showScreen('s-app');initApp();
+    // listen realtime
+    listenTrip(code);
+  }).catch(function(){
+    btn.textContent='🚀 เข้าร่วม';btn.disabled=false;
+    toast('❌ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+  });
+});
+
+document.getElementById('join-input').addEventListener('input',function(){
+  this.value=this.value.toUpperCase();
+});
+
+// ══════════════════════════════════════
+// SETUP
+// ══════════════════════════════════════
+function renderSetupDots(){
+  var d=document.getElementById('step-dots');d.innerHTML='';
+  for(var i=0;i<4;i++){
+    var dot=document.createElement('div');
+    dot.className='sdot-step'+(i===setupStep?' active':i<setupStep?' done':'');
+    d.appendChild(dot);
+  }
+}
+function goStep(n){
+  document.getElementById('sp-'+setupStep).classList.remove('active');
+  setupStep=n;
+  document.getElementById('sp-'+setupStep).classList.add('active');
+  renderSetupDots();
+}
+
+document.getElementById('setup-back').addEventListener('click',function(){showScreen('s-landing')});
+document.getElementById('sp0-next').addEventListener('click',function(){
+  if(!document.getElementById('s-name').value.trim()){toast('⚠️ กรุณากรอกชื่อทริป');return}
+  goStep(1);
+});
+document.getElementById('sp1-prev').addEventListener('click',function(){goStep(0)});
+document.getElementById('sp1-next').addEventListener('click',function(){
+  if(!setupData.travelers.length){toast('⚠️ เพิ่มผู้เดินทางอย่างน้อย 1 คน');return}
+  goStep(2);
+});
+document.getElementById('sp2-prev').addEventListener('click',function(){goStep(1)});
+document.getElementById('sp2-next').addEventListener('click',function(){goStep(3)});
+document.getElementById('sp3-prev').addEventListener('click',function(){goStep(2)});
+
+// Traveler
+document.getElementById('traveler-add').addEventListener('click',addTraveler);
+document.getElementById('traveler-inp').addEventListener('keydown',function(e){if(e.key==='Enter')addTraveler()});
+function addTraveler(){
+  var inp=document.getElementById('traveler-inp'),name=inp.value.trim();
+  if(!name)return;
+  setupData.travelers.push(name);inp.value='';renderTravelerList();
+}
+function renderTravelerList(){
+  var el=document.getElementById('traveler-list');
+  if(!setupData.travelers.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;padding:4px 0">ยังไม่มีผู้เดินทาง</div>';return}
+  el.innerHTML=setupData.travelers.map(function(n,i){
+    var c=AVATAR_COLORS[i%AVATAR_COLORS.length];
+    return '<div class="traveler-row"><div class="t-avatar" style="background:'+c+'20;color:'+c+'">'+n[0].toUpperCase()+'</div>'+
+      '<div class="t-name">'+esc(n)+'</div>'+
+      '<button class="t-del" data-i="'+i+'">✕</button></div>';
+  }).join('');
+  el.querySelectorAll('.t-del').forEach(function(b){
+    b.addEventListener('click',function(){setupData.travelers.splice(+this.dataset.i,1);renderTravelerList()});
+  });
+}
+
+// Currency chips
+document.getElementById('cur-grid').addEventListener('click',function(e){
+  var chip=e.target.closest('.cur-chip');if(!chip)return;
+  var cur=chip.dataset.cur;
+  if(cur==='THB')return;
+  chip.classList.toggle('on');
+  var sel=Array.from(document.querySelectorAll('.cur-chip.on')).map(function(c){return c.dataset.cur});
+  setupData.currencies=sel.includes('THB')?sel:['THB'].concat(sel);
+});
+
+// Extra cats
+document.getElementById('extra-grid').addEventListener('click',function(e){
+  var chip=e.target.closest('.extra-chip');if(!chip)return;
+  chip.classList.toggle('on');
+  var cat=chip.dataset.cat,idx=setupData.extraCats.indexOf(cat);
+  if(idx>=0)setupData.extraCats.splice(idx,1);else setupData.extraCats.push(cat);
+});
+
+// Create trip
+document.getElementById('btn-create-trip').addEventListener('click',function(){
+  var name=document.getElementById('s-name').value.trim();
+  if(!name){toast('⚠️ กรุณากรอกชื่อทริป');return}
+  var code=genCode();
+  trip={
+    code:code,name:name,
+    dateStart:document.getElementById('s-start').value,
+    dateEnd:document.getElementById('s-end').value,
+    destination:document.getElementById('s-dest').value.trim(),
+    travelers:setupData.travelers.slice(),
+    currencies:setupData.currencies.slice(),
+    baseCurrency:document.getElementById('s-base').value,
+    categories:DEFAULT_CATS.concat(setupData.extraCats),
+    expenses:[],rates:{},createdAt:Date.now()
+  };
+  expenses=[];customRates={};
+  var btn=document.getElementById('btn-create-trip');
+  btn.textContent='⏳ กำลังสร้าง...';btn.disabled=true;
+  db.ref('trips/'+code).set(trip).then(function(){
+    btn.textContent='🚀 สร้างทริป!';btn.disabled=false;
+    incCounter();
+    saveRecentTrip(code);
+    showScreen('s-app');initApp();
+    listenTrip(code);
+    setTimeout(function(){showCodeModal()},400);
+  }).catch(function(){
+    btn.textContent='🚀 สร้างทริป!';btn.disabled=false;
+    toast('❌ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+  });
+});
+
+// ══════════════════════════════════════
+// REALTIME LISTENER
+// ══════════════════════════════════════
+var tripListener = null;
+function listenTrip(code){
+  if(tripListener) tripListener.off();
+  tripListener = db.ref('trips/'+code);
+  // update status
+  document.getElementById('s-dot').className='s-dot live';
+  document.getElementById('s-txt').textContent='Live · sync แล้ว';
+  tripListener.on('value', function(snap){
+    if(!snap.exists()) return;
+    var data = snap.val();
+    var newExp = data.expenses || [];
+    var newRates = data.rates || {};
+    // อัปเดตถ้ามีการเปลี่ยนแปลงจากคนอื่น
+    expenses = newExp;
+    customRates = newRates;
+    trip = data;
+    renderSummaryStrip();
+    renderList();
+    if(document.getElementById('tab-summary').classList.contains('active')) renderSummary();
+  });
+}
+
+// ══════════════════════════════════════
+// RECENT TRIPS (localStorage เก็บแค่ code+ชื่อ)
+// ══════════════════════════════════════
+function saveRecentTrip(code){
+  var recent = getRecentTrips();
+  recent = recent.filter(function(r){return r.code!==code});
+  recent.unshift({code:code, name:trip.name, dest:trip.destination});
+  if(recent.length>5) recent=recent.slice(0,5);
+  localStorage.setItem('jodyub_recent', JSON.stringify(recent));
+  renderRecentTrips();
+}
+function getRecentTrips(){
+  try{return JSON.parse(localStorage.getItem('jodyub_recent')||'[]')}catch(e){return[]}
+}
+function renderRecentTrips(){
+  var recent = getRecentTrips();
+  var wrap = document.getElementById('recent-trips-wrap');
+  if(!wrap) return;
+  if(!recent.length){wrap.style.display='none';return}
+  wrap.style.display='block';
+  wrap.innerHTML='<div class="land-card-title">🕐 ทริปล่าสุด</div>'+
+    recent.map(function(r){
+      return '<div class="recent-trip-item" data-code="'+r.code+'" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;transition:all .2s">'+
+        '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+esc(r.name)+'</div>'+
+        '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+esc(r.dest||'')+'</div></div>'+
+        '<div style="font-family:monospace;font-size:10px;color:var(--purple);font-weight:700">'+r.code+'</div>'+
+        '<div style="color:var(--muted);font-size:12px">→</div></div>';
+    }).join('');
+  wrap.querySelectorAll('.recent-trip-item').forEach(function(el){
+    el.addEventListener('click',function(){
+      var code=this.dataset.code;
+      toast('⏳ กำลังโหลด...');
+      db.ref('trips/'+code).once('value').then(function(snap){
+        if(!snap.exists()){toast('❌ ไม่พบทริปนี้แล้ว');return}
+        trip=snap.val();expenses=trip.expenses||[];customRates=trip.rates||{};
+        saveRecentTrip(code);
+        showScreen('s-app');initApp();listenTrip(code);
+      });
+    });
+  });
+}
+renderRecentTrips();
+
+function initApp(){
+  document.getElementById('app-name').textContent=trip.name;
+  document.getElementById('app-code').textContent=trip.code;
+  document.getElementById('modal-code-txt').textContent=trip.code;
+  document.getElementById('s-txt').textContent='localStorage';
+  document.getElementById('s-dot').className='s-dot live';
+
+  selCat=trip.categories[0]||'food';
+  selPayer=trip.travelers[0]||'';
+  selPay='cash';filterDay='all';showBase=false;
+
+  buildDaySelect();buildCurSelect();buildCatGrid();buildPayerRow();
+  renderSummaryStrip();renderDayFilter();renderList();renderSummary();
+}
+
+// ── Day select ──
+function buildDaySelect(){
+  var sel=document.getElementById('f-day');sel.innerHTML='';
+  buildDays().forEach(function(d){
+    var o=document.createElement('option');o.value=d.key;o.textContent=d.label;sel.appendChild(o);
+  });
+}
+
+// ── Currency selects ──
+function buildCurSelect(){
+  var tc=tripCurs(),sorted=tc.concat(trip.currencies.filter(function(c){return c===trip.baseCurrency}));
+  ['f-cur','f-cur2'].forEach(function(id){
+    var sel=document.getElementById(id);sel.innerHTML='';
+    sorted.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
+    if(sorted.length)sel.value=sorted[0];
+  });
+  // sync f-cur and f-cur2
+  document.getElementById('f-cur').addEventListener('change',function(){document.getElementById('f-cur2').value=this.value});
+  document.getElementById('f-cur2').addEventListener('change',function(){document.getElementById('f-cur').value=this.value});
+}
+
+// ── Category grid ──
+function buildCatGrid(){
+  var grid=document.getElementById('cat-grid-app');
+  var cats=trip.categories||DEFAULT_CATS;
+  var cols=cats.length<=6?3:Math.min(4,Math.ceil(cats.length/2));
+  grid.style.gridTemplateColumns='repeat('+cols+',1fr)';
+  grid.innerHTML=cats.map(function(cat){
+    var c=ALL_CATS[cat]||{emoji:'📦',label:cat,color:'#7d8590'};
+    var on=cat===selCat;
+    return '<div class="cat-btn-app'+(on?' on':'')+'" data-cat="'+cat+'" style="'+(on?'border-color:'+c.color+';background:'+c.color+'22':'')+'">'+
+      '<span class="ci">'+c.emoji+'</span><span class="cl" style="color:'+(on?c.color:'')+'">'+c.label.split(' ')[0]+'</span></div>';
+  }).join('');
+  grid.querySelectorAll('.cat-btn-app').forEach(function(b){
+    b.addEventListener('click',function(){
+      selCat=this.dataset.cat;buildCatGrid();
+    });
+  });
+}
+
+// ── Payer row ──
+function buildPayerRow(){
+  var row=document.getElementById('payer-row');
+  row.innerHTML=trip.travelers.map(function(name,i){
+    var c=AVATAR_COLORS[i%AVATAR_COLORS.length],on=name===selPayer;
+    return '<div class="payer-chip'+(on?' on':'')+'" data-payer="'+esc(name)+'" style="'+(on?'border-color:'+c+';background:'+c+'22':'')+'">'+
+      '<div class="payer-av" style="background:'+c+'20;color:'+c+'">'+name[0].toUpperCase()+'</div>'+esc(name)+'</div>';
+  }).join('');
+  row.querySelectorAll('.payer-chip').forEach(function(b){
+    b.addEventListener('click',function(){selPayer=this.dataset.payer;buildPayerRow()});
+  });
+}
+
+// ── Pay method ──
+document.getElementById('pay-row').addEventListener('click',function(e){
+  var btn=e.target.closest('.pay-btn');if(!btn)return;
+  selPay=btn.dataset.pay;
+  document.querySelectorAll('.pay-btn').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');
+});
+
+// ── Tab switching ──
+document.querySelector('.tab-bar').addEventListener('click',function(e){
+  var btn=e.target.closest('.tab-btn');if(!btn)return;
+  var tab=btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active')});
+  btn.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='summary')renderSummary();
+});
+
+// ══════════════════════════════════════
+// ADD EXPENSE
+// ══════════════════════════════════════
+document.getElementById('btn-add').addEventListener('click',addExpense);
+document.getElementById('f-name').addEventListener('keydown',function(e){if(e.key==='Enter')addExpense()});
+
+function addExpense(){
+  var day=document.getElementById('f-day').value;
+  var name=document.getElementById('f-name').value.trim();
+  var amount=parseFloat(document.getElementById('f-amount').value);
+  var cur=document.getElementById('f-cur2').value;
+  var note=document.getElementById('f-note').value.trim();
+  if(!name){toast('⚠️ กรอกชื่อรายการด้วย');return}
+  if(!amount||amount<=0){toast('⚠️ กรอกจำนวนเงินด้วย');return}
+  var e={id:Date.now().toString(),day:day,cat:selCat,name:name,amount:amount,
+    currency:cur,note:note,pay:selPay,payer:selPayer,thb:toBase(amount,cur),ts:Date.now()};
+  expenses.push(e);saveExpenses();
+  document.getElementById('f-name').value='';
+  document.getElementById('f-amount').value='';
+  document.getElementById('f-note').value='';
+  toast('✅ เพิ่ม "'+name+'" แล้ว');
+  // switch to list
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active')});
+  document.querySelector('[data-tab="list"]').classList.add('active');
+  document.getElementById('tab-list').classList.add('active');
+  filterDay='all';renderDayFilter();renderList();renderSummaryStrip();
+}
+
+// ══════════════════════════════════════
+// SUMMARY STRIP
+// ══════════════════════════════════════
+function renderSummaryStrip(){
+  var strip=document.getElementById('sum-strip');
+  var totalBase=expenses.reduce(function(s,e){return s+e.thb},0);
+  var days=buildDays().length;
+  var tc=tripCurs();
+  var curMap={};
+  expenses.forEach(function(e){if(!curMap[e.currency])curMap[e.currency]=0;curMap[e.currency]+=e.amount});
+
+  var mainTotal,avgVal;
+  if(showBase||!tc.length){
+    mainTotal=fmt(totalBase,trip.baseCurrency);
+    avgVal=fmt(days>0?totalBase/days:0,trip.baseCurrency);
+  } else if(tc.length===1&&curMap[tc[0]]){
+    mainTotal=fmt(curMap[tc[0]],tc[0]);
+    avgVal=fmt(days>0?(curMap[tc[0]]||0)/days:0,tc[0]);
+  } else {
+    mainTotal=fmt(totalBase,trip.baseCurrency);
+    avgVal=fmt(days>0?totalBase/days:0,trip.baseCurrency);
+  }
+
+  var btnLabel=showBase?'🔄 '+tc[0]:'🔄 '+(tc[0]||trip.baseCurrency);
+  var btnActive=showBase?'active':'';
+
+  strip.style.gridTemplateColumns=tc.length?'1fr 1fr auto':'1fr 1fr';
+  strip.innerHTML=
+    '<div class="sum-cell"><div class="sum-label">รวมทั้งหมด</div>'+
+      '<div class="sum-value" style="color:var(--green)">'+mainTotal+'</div>'+
+      '<div class="sum-sub">'+expenses.length+' รายการ</div></div>'+
+    '<div class="sum-cell"><div class="sum-label">เฉลี่ย/วัน</div>'+
+      '<div class="sum-value" style="color:var(--blue)">'+avgVal+'</div>'+
+      '<div class="sum-sub">'+days+' วัน</div></div>'+
+    (tc.length?'<div class="sum-cell" style="display:flex;align-items:center;padding:10px 12px">'+
+      '<button class="cur-toggle-btn '+btnActive+'" id="cur-toggle">'+btnLabel+'</button></div>':'');
+
+  var tb=document.getElementById('cur-toggle');
+  if(tb)tb.addEventListener('click',function(){
+    showBase=!showBase;renderSummaryStrip();renderList();renderSummary();
+  });
+}
+
+// ══════════════════════════════════════
+// LIST
+// ══════════════════════════════════════
+function renderDayFilter(){
+  var wrap=document.getElementById('day-scroll');
+  var days=buildDays();
+  wrap.innerHTML='<div class="day-chip-filter'+(filterDay==='all'?' active':'')+'" data-day="all">ทั้งหมด</div>'+
+    days.map(function(d){
+      return '<div class="day-chip-filter'+(filterDay===d.key?' active':'')+'" data-day="'+d.key+'">'+
+        d.key.replace('day','D')+'</div>';
+    }).join('');
+  wrap.querySelectorAll('.day-chip-filter').forEach(function(c){
+    c.addEventListener('click',function(){filterDay=this.dataset.day;renderDayFilter();renderList()});
+  });
+}
+
+function renderList(){
+  var list=document.getElementById('expense-list');
+  var tc=tripCurs();
+  var filtered=expenses.filter(function(e){return filterDay==='all'||e.day===filterDay});
+  filtered.sort(function(a,b){
+    var da=parseInt((a.day||'day0').replace('day',''))||0;
+    var db=parseInt((b.day||'day0').replace('day',''))||0;
+    return da!==db?da-db:a.ts-b.ts;
+  });
+  document.getElementById('list-count').textContent=filtered.length+' รายการ';
+  if(!filtered.length){
+    list.innerHTML='<div class="empty"><div class="empty-icon">🧾</div><p>ยังไม่มีรายการ<br>เพิ่มค่าใช้จ่ายแรกได้เลย!</p></div>';
+    return;
+  }
+  var lastDay='';
+  list.innerHTML=filtered.map(function(e,i){
+    var cd=ALL_CATS[e.cat]||{emoji:'📦',label:e.cat,color:'#7d8590'};
+    var pc=AVATAR_COLORS[trip.travelers.indexOf(e.payer)%AVATAR_COLORS.length]||'#7d8590';
+    var payIcon={cash:'💵',card:'💳',travel:'🪙'}[e.pay]||'💵';
+    var dayHd='';
+    if(e.day&&e.day!==lastDay){
+      lastDay=e.day;
+      var dobj=buildDays().find(function(d){return d.key===e.day});
+      dayHd='<div class="day-divider">'+(dobj?dobj.label:e.day.replace('day','Day '))+'</div>';
+    }
+    // amount display
+    var mainAmt,subAmt;
+    if(showBase||!tc.length){
+      mainAmt=fmt(e.thb,trip.baseCurrency);
+      subAmt=e.currency!==trip.baseCurrency?fmt(e.amount,e.currency):'';
+    } else {
+      mainAmt=fmt(e.amount,e.currency);
+      subAmt=e.currency!==trip.baseCurrency?'≈ '+fmt(e.thb,trip.baseCurrency):'';
+    }
+    return dayHd+
+      '<div class="expense-card">'+
+        '<div class="e-day-badge">'+e.day.replace('day','D')+'</div>'+
+        '<div class="e-body">'+
+          '<div class="e-name">'+esc(e.name)+'</div>'+
+          '<div class="e-tags">'+
+            '<span class="e-tag" style="background:'+cd.color+'22;color:'+cd.color+'">'+cd.emoji+' '+cd.label+'</span>'+
+            '<span class="e-tag" style="background:'+pc+'22;color:'+pc+'">'+esc(e.payer)+'</span>'+
+            '<span style="font-size:12px">'+payIcon+'</span>'+
+          '</div>'+
+          (e.note?'<div class="e-note">📝 '+esc(e.note)+'</div>':'')+
+        '</div>'+
+        '<div class="e-right">'+
+          '<div class="e-amt" style="color:'+cd.color+'">'+mainAmt+'</div>'+
+          (subAmt?'<div class="e-sub">'+subAmt+'</div>':'')+
+        '</div>'+
+        '<button class="e-del" data-id="'+e.id+'">✕</button>'+
+      '</div>';
+  }).join('');
+
+  list.querySelectorAll('.e-del').forEach(function(b){
+    b.addEventListener('click',function(){
+      var id=this.dataset.id;
+      expenses=expenses.filter(function(e){return e.id!==id});
+      saveExpenses();toast('🗑 ลบแล้ว');
+      renderList();renderSummaryStrip();renderSummary();
+    });
+  });
+}
+
+// ══════════════════════════════════════
+// SUMMARY
+// ══════════════════════════════════════
+function renderSummary(){
+  renderRates();renderChart();renderCatAccordion();renderPayerSum();renderDayBars();
+}
+
+// Rates
+function renderRates(){
+  var wrap=document.getElementById('rates-wrap');
+  var tc=tripCurs();
+  if(!tc.length){wrap.innerHTML='<div style="color:var(--muted);font-size:13px">ทริปนี้ใช้สกุลเงินเดียว</div>';return}
+  wrap.innerHTML=tc.map(function(cur){
+    var rate=customRates[cur]!==undefined?customRates[cur]:(DEFAULT_RATES[cur]||1);
+    var edited=customRates[cur]!==undefined;
+    return '<div class="rate-card"><div class="rate-row">'+
+      '<div class="rate-label">'+cur+'</div>'+
+      '<div class="rate-eq">1 '+cur+' =</div>'+
+      '<input class="rate-inp" type="number" value="'+rate+'" min="0" step="0.0001" data-cur="'+cur+'">'+
+      '<div class="rate-unit">'+trip.baseCurrency+'</div>'+
+      '<button class="rate-reset'+(edited?' edited':'')+'" data-cur="'+cur+'" title="รีเซ็ต">↺</button>'+
+    '</div>'+
+    '<div class="rate-hint">↺ = default · <span style="color:var(--orange)">สีส้ม</span> = แก้ไขเอง</div></div>';
+  }).join('');
+
+  wrap.querySelectorAll('.rate-inp').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      var cur=this.dataset.cur,val=parseFloat(this.value);
+      if(isNaN(val)||val<=0){toast('⚠️ ค่าไม่ถูกต้อง');return}
+      customRates[cur]=val;saveRates();
+      var changed=0;
+      expenses.forEach(function(e){if(e.currency===cur){e.thb=e.amount*val;changed++}});
+      if(changed){saveExpenses();renderList();renderSummaryStrip();toast('💱 อัปเดต '+cur+' · '+changed+' รายการ')}
+      else toast('💱 บันทึกอัตรา '+cur);
+      renderSummary();
+    });
+  });
+  wrap.querySelectorAll('.rate-reset').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var cur=this.dataset.cur;delete customRates[cur];saveRates();
+      var def=DEFAULT_RATES[cur]||1;
+      expenses.forEach(function(e){if(e.currency===cur)e.thb=e.amount*def});
+      saveExpenses();renderSummary();renderList();renderSummaryStrip();toast('↺ รีเซ็ต '+cur);
+    });
+  });
+}
+
+// Chart
+function renderChart(){
+  var catMap={},totalBase=expenses.reduce(function(s,e){return s+e.thb},0);
+  expenses.forEach(function(e){if(!catMap[e.cat])catMap[e.cat]=0;catMap[e.cat]+=e.thb});
+  var entries=Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a]});
+  if(!entries.length){
+    document.getElementById('chart-legend').innerHTML='<div style="color:var(--muted);font-size:12px">ยังไม่มีข้อมูล</div>';
+    return;
+  }
+  var labels=entries.map(function(c){return (ALL_CATS[c]||{label:c}).label});
+  var data=entries.map(function(c){return catMap[c]});
+  var colors=entries.map(function(c){return (ALL_CATS[c]||{color:'#7d8590'}).color});
+
+  if(donutChart)donutChart.destroy();
+  donutChart=new Chart(document.getElementById('donut-chart'),{
+    type:'doughnut',
+    data:{labels:labels,datasets:[{data:data,backgroundColor:colors,borderWidth:0,hoverOffset:4}]},
+    options:{cutout:'68%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:400}}
+  });
+
+  var tc=tripCurs();
+  document.getElementById('chart-legend').innerHTML=entries.map(function(cat){
+    var cd=ALL_CATS[cat]||{emoji:'📦',label:cat,color:'#7d8590'};
+    var pct=totalBase>0?(catMap[cat]/totalBase*100).toFixed(0):0;
+    var displayAmt;
+    if(showBase||tc.length!==1){displayAmt=fmt(catMap[cat],trip.baseCurrency)}
+    else{
+      var curMap={};expenses.forEach(function(e){if(e.cat===cat){if(!curMap[e.currency])curMap[e.currency]=0;curMap[e.currency]+=e.amount}});
+      var keys=Object.keys(curMap);
+      displayAmt=keys.length===1?fmt(curMap[keys[0]],keys[0]):fmt(catMap[cat],trip.baseCurrency);
+    }
+    return '<div class="legend-row">'+
+      '<div class="legend-dot" style="background:'+cd.color+'"></div>'+
+      '<span class="legend-name">'+cd.emoji+' '+cd.label+'</span>'+
+      '<span class="legend-pct" style="color:'+cd.color+'">'+pct+'%</span>'+
+      '<span class="legend-val">'+displayAmt+'</span></div>';
+  }).join('');
+}
+
+// Category accordion
+function renderCatAccordion(){
+  var totalBase=expenses.reduce(function(s,e){return s+e.thb},0);
+  var catMap={},catItems={};
+  expenses.forEach(function(e){
+    if(!catMap[e.cat]){catMap[e.cat]=0;catItems[e.cat]=[]}
+    catMap[e.cat]+=e.thb;catItems[e.cat].push(e);
+  });
+  var entries=Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a]});
+  var tc=tripCurs();
+  var wrap=document.getElementById('cat-accordion');
+  wrap.innerHTML=entries.map(function(cat){
+    var cd=ALL_CATS[cat]||{emoji:'📦',label:cat,color:'#7d8590'};
+    var pct=totalBase>0?(catMap[cat]/totalBase*100).toFixed(0):0;
+    var curMap2={};
+    catItems[cat].forEach(function(e){if(!curMap2[e.currency])curMap2[e.currency]=0;curMap2[e.currency]+=e.amount});
+    var keys2=Object.keys(curMap2);
+    var dispAmt=showBase||tc.length!==1||keys2.length!==1?fmt(catMap[cat],trip.baseCurrency):fmt(curMap2[keys2[0]],keys2[0]);
+    var items=catItems[cat].sort(function(a,b){return a.ts-b.ts}).map(function(e){
+      var eAmt=showBase||e.currency===trip.baseCurrency?fmt(e.thb,trip.baseCurrency):fmt(e.amount,e.currency);
+      return '<div class="cat-acc-item">'+
+        '<div class="acc-day">'+e.day.replace('day','D')+'</div>'+
+        '<div class="acc-name">'+esc(e.name)+(e.note?' <span style="color:var(--muted)">· '+esc(e.note)+'</span>':'')+
+        ' <span style="color:var(--muted);font-size:10px">'+esc(e.payer)+'</span></div>'+
+        '<div class="acc-amt" style="color:'+cd.color+'">'+eAmt+'</div></div>';
+    }).join('');
+    return '<div class="cat-acc" data-cat="'+cat+'">'+
+      '<div class="cat-acc-hd">'+
+        '<div class="cat-acc-dot" style="background:'+cd.color+'"></div>'+
+        '<div class="cat-acc-name">'+cd.emoji+' '+cd.label+'</div>'+
+        '<div class="cat-acc-pct" style="color:'+cd.color+'">'+pct+'%</div>'+
+        '<div class="cat-acc-amt" style="color:'+cd.color+'">'+dispAmt+'</div>'+
+        '<div class="cat-acc-arr">▼</div>'+
+      '</div>'+
+      '<div class="cat-acc-body">'+items+'</div></div>';
+  }).join('');
+  wrap.querySelectorAll('.cat-acc-hd').forEach(function(hd){
+    hd.addEventListener('click',function(){this.parentElement.classList.toggle('open')});
+  });
+}
+
+// Payer summary
+function renderPayerSum(){
+  var totalBase=expenses.reduce(function(s,e){return s+e.thb},0);
+  var payerMap={};
+  trip.travelers.forEach(function(t){payerMap[t]={base:0,byCur:{},count:0}});
+  expenses.forEach(function(e){
+    if(!payerMap[e.payer])payerMap[e.payer]={base:0,byCur:{},count:0};
+    payerMap[e.payer].base+=e.thb;payerMap[e.payer].count++;
+    if(!payerMap[e.payer].byCur[e.currency])payerMap[e.payer].byCur[e.currency]=0;
+    payerMap[e.payer].byCur[e.currency]+=e.amount;
+  });
+  var tc=tripCurs();
+  document.getElementById('payer-sum').innerHTML=trip.travelers.map(function(name,i){
+    var p=payerMap[name]||{base:0,byCur:{},count:0};
+    var col=AVATAR_COLORS[i%AVATAR_COLORS.length];
+    var keys=Object.keys(p.byCur);
+    var mainAmt,subAmt;
+    if(showBase||tc.length!==1||keys.length!==1){
+      mainAmt=fmt(p.base,trip.baseCurrency);
+      subAmt=(!showBase&&keys.length)?keys.map(function(c){return fmt(p.byCur[c],c)}).join(' + '):'';
+    } else {
+      mainAmt=fmt(p.byCur[keys[0]],keys[0]);subAmt='≈ '+fmt(p.base,trip.baseCurrency);
+    }
+    return '<div class="payer-card-sum">'+
+      '<div class="p-av-big" style="background:'+col+'20;color:'+col+'">'+name[0].toUpperCase()+'</div>'+
+      '<div class="p-info"><div class="p-name">'+esc(name)+'</div><div class="p-count">'+p.count+' รายการ</div></div>'+
+      '<div class="p-total"><div class="p-main" style="color:'+col+'">'+mainAmt+'</div>'+
+      (subAmt?'<div class="p-sub">'+subAmt+'</div>':'')+
+      '</div></div>';
+  }).join('');
+}
+
+// Day bars
+function renderDayBars(){
+  var days=buildDays(),totals={};
+  days.forEach(function(d){totals[d.key]=0});
+  expenses.forEach(function(e){if(totals[e.day]!==undefined)totals[e.day]+=e.thb});
+  var max=Math.max.apply(null,days.map(function(d){return totals[d.key]||0}))||1;
+  var tc=tripCurs();
+  document.getElementById('day-bars').innerHTML=days.map(function(d){
+    var pct=Math.round((totals[d.key]||0)/max*100);
+    var dispAmt;
+    if(showBase||tc.length!==1){
+      dispAmt=fmt(totals[d.key]||0,trip.baseCurrency);
+    } else {
+      var dMap={};
+      expenses.filter(function(e){return e.day===d.key}).forEach(function(e){
+        if(!dMap[e.currency])dMap[e.currency]=0;dMap[e.currency]+=e.amount;
+      });
+      var k=Object.keys(dMap);
+      dispAmt=k.length===1?fmt(dMap[k[0]],k[0]):fmt(totals[d.key]||0,trip.baseCurrency);
+    }
+    return '<div class="day-bar">'+
+      '<div class="day-bar-hd"><span class="day-bar-lbl">'+d.label+'</span>'+
+      '<span class="day-bar-val" style="color:var(--blue)">'+dispAmt+'</span></div>'+
+      '<div class="day-bar-track"><div class="day-bar-fill" style="width:'+pct+'%"></div></div></div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════
+// CODE MODAL
+// ══════════════════════════════════════
+function showCodeModal(){
+  if(trip)document.getElementById('modal-code-txt').textContent=trip.code;
+  document.getElementById('code-modal').classList.add('open');
+}
+document.getElementById('app-code').addEventListener('click',showCodeModal);
+document.getElementById('modal-close').addEventListener('click',function(){
+  document.getElementById('code-modal').classList.remove('open');
+});
+document.getElementById('code-modal').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('open');
+});
+document.getElementById('modal-copy').addEventListener('click',function(){
+  if(trip)navigator.clipboard.writeText(trip.code).then(function(){toast('📋 คัดลอก Code แล้ว!')});
+});
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function toast(msg){
+  var wrap=document.getElementById('toast-wrap');
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;
+  wrap.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},2500);
+}
+</script>
+</body>
+</html>
