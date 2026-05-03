@@ -602,7 +602,8 @@ select option{background:var(--surface2)}
     <div class="app-hd-top">
       <div class="app-title">
         <h2 id="app-name">—</h2>
-        <div><span class="code-badge" id="app-code" title="คลิกดู Trip Code">●●●●●●</span></div>
+        <div><span class="code-badge" id="app-code" title="คลิกดู Trip Code">●●●●●●</span>
+        <button id="btn-share-trip" onclick="shareTrip()" style="margin-left:6px;padding:3px 8px;background:var(--accent);border:none;border-radius:6px;color:var(--accent-dark);font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font)">🔗 แชร์</button></div>
       </div>
       <div class="status-pill" id="status-pill">
         <div class="s-dot" id="s-dot"></div>
@@ -715,8 +716,10 @@ select option{background:var(--surface2)}
     <div style="font-size:17px;font-weight:700;margin-bottom:4px">Trip Code</div>
     <div class="modal-hint">แชร์ให้เพื่อนในทริปเพื่อเข้าร่วม</div>
     <div class="modal-code" id="modal-code-txt">——</div>
-    <div class="modal-hint">กรอก code ที่หน้าแรกเพื่อเข้าร่วมทริปเดียวกัน</div>
-    <button class="modal-btn" id="modal-copy">📋 คัดลอก</button>
+    <div id="modal-link-box" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);word-break:break-all;margin-bottom:14px;text-align:left"></div>
+    <div class="modal-hint">กดปุ่มด้านล่างเพื่อคัดลอก link แชร์ใน LINE ได้เลย</div>
+    <button class="modal-btn" id="modal-share" style="background:var(--accent);color:var(--accent-dark);font-weight:700;border-color:var(--accent)">🔗 คัดลอก Link แชร์</button>
+    <button class="modal-btn" id="modal-copy">📋 คัดลอก Code</button>
     <button class="modal-btn" id="modal-close">ปิด</button>
   </div>
 </div>
@@ -845,6 +848,31 @@ function tripCurs(){return(trip.currencies||[]).filter(function(c){return c!==tr
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
   document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════════════════════
+// SHAREABLE LINK — check URL on load
+// ══════════════════════════════════════
+function checkURLTrip(){
+  var params = new URLSearchParams(window.location.search);
+  var code = params.get('trip');
+  if(!code) return;
+  code = code.toUpperCase();
+  toast('⏳ กำลังโหลดทริป '+code+'...');
+  db.ref('trips/'+code).once('value').then(function(snap){
+    if(!snap.exists()){toast('❌ ไม่พบทริป: '+code);return}
+    trip=snap.val();expenses=trip.expenses||[];customRates=trip.rates||{};
+    saveRecentTrip(code);
+    showScreen('s-app');initApp();listenTrip(code);
+    // clear URL param หลังโหลดสำเร็จ
+    window.history.replaceState({},'',window.location.pathname);
+  }).catch(function(){
+    toast('❌ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+  });
+}
+
+function getShareLink(code){
+  return window.location.origin + window.location.pathname + '?trip=' + code;
 }
 
 // ══════════════════════════════════════
@@ -1054,6 +1082,7 @@ function renderRecentTrips(){
   });
 }
 renderRecentTrips();
+checkURLTrip();
 
 function initApp(){
   document.getElementById('app-name').textContent=trip.name;
@@ -1484,7 +1513,11 @@ function renderDayBars(){
 // CODE MODAL
 // ══════════════════════════════════════
 function showCodeModal(){
-  if(trip)document.getElementById('modal-code-txt').textContent=trip.code;
+  if(trip){
+    document.getElementById('modal-code-txt').textContent=trip.code;
+    var link=getShareLink(trip.code);
+    document.getElementById('modal-link-box').textContent=link;
+  }
   document.getElementById('code-modal').classList.add('open');
 }
 document.getElementById('app-code').addEventListener('click',showCodeModal);
@@ -1497,6 +1530,29 @@ document.getElementById('code-modal').addEventListener('click',function(e){
 document.getElementById('modal-copy').addEventListener('click',function(){
   if(trip)navigator.clipboard.writeText(trip.code).then(function(){toast('📋 คัดลอก Code แล้ว!')});
 });
+document.getElementById('modal-share').addEventListener('click',function(){
+  if(!trip)return;
+  var link=getShareLink(trip.code);
+  if(navigator.share){
+    navigator.share({title:'Jodyub — '+trip.name,text:'เข้าร่วมทริป '+trip.name+' ได้เลย!',url:link})
+    .catch(function(){});
+  } else {
+    navigator.clipboard.writeText(link).then(function(){toast('🔗 คัดลอก Link แล้ว! แชร์ใน LINE ได้เลย')});
+  }
+});
+
+function shareTrip(){
+  if(!trip)return;
+  var link=getShareLink(trip.code);
+  if(navigator.share){
+    navigator.share({title:'Jodyub — '+trip.name,text:'เข้าร่วมทริป '+trip.name+'!',url:link})
+    .catch(function(){});
+  } else {
+    navigator.clipboard.writeText(link).then(function(){
+      toast('🔗 คัดลอก Link แล้ว! แชร์ใน LINE ได้เลย');
+    });
+  }
+}
 
 // ══════════════════════════════════════
 // TOAST
@@ -1506,6 +1562,22 @@ function toast(msg){
   var t=document.createElement('div');t.className='toast';t.textContent=msg;
   wrap.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},2500);
 }
+
+function shareTrip(){
+  if(!trip)return;
+  var link=getShareLink(trip.code);
+  if(navigator.share){
+    navigator.share({title:'Jodyub — '+trip.name,text:'เข้าร่วมทริป '+trip.name+'!',url:link})
+    .catch(function(){});
+  } else {
+    navigator.clipboard.writeText(link).then(function(){
+      toast('🔗 คัดลอก Link แล้ว! แชร์ใน LINE ได้เลย');
+    });
+  }
+}
+
+// ── Check URL trip on load ──
+checkURLTrip();
 </script>
 </body>
 </html>
