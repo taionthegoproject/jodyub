@@ -2,1637 +2,1446 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Jodyub</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b24">
+<title>Jodyub · จดยับ</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ───────── TOKENS ───────── */
-:root {
-  --bg:#0d0d2b; --surface:#13133a; --surface2:#1a1a4a; --surface3:#1e1e5a;
-  --border:#1e1e4a; --border2:rgba(192,240,0,0.15);
-  --text:#ffffff; --text2:#c9d1d9; --muted:#6b7280;
-  --blue:#8b5cf6; --green:#c0f000; --red:#f85149;
-  --orange:#f0a500; --purple:#8b5cf6; --pink:#f472b6; --cyan:#39d3f2;
-  --blue-glow:rgba(139,92,246,.15); --green-glow:rgba(192,240,0,.12);
-  --accent:#c0f000; --accent-dark:#0d0d2b;
-  --font:'IBM Plex Sans Thai',sans-serif;
-  --radius:12px; --radius-sm:8px; --radius-lg:18px;
-  --nav-h:60px;
+:root{
+  --bg:#0b0b24;--s1:#13133a;--s2:#1a1a4a;--s3:#26265f;
+  --line:rgba(255,255,255,.07);--tx:#fff;--tx2:#b9bfd6;--mu:#7a80a0;
+  --lime:#c0f000;--vio:#8b5cf6;--red:#ff7070;--amber:#f0a500;
+  --r:20px;--num:'Space Grotesk',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{font-size:12px}
-html,body{height:100%;overflow:hidden}
-body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:1rem;display:flex;flex-direction:column}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'IBM Plex Sans Thai',sans-serif;background:var(--bg);color:var(--tx);font-size:15px;line-height:1.45;min-height:100vh}
+button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer;font-size:inherit}
+input,select{font-family:inherit;font-size:16px}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.screen{display:none}
+.screen.active{display:block}
+.wrap{max-width:460px;margin:0 auto;padding:16px 16px 40px}
+.muted{color:var(--mu)}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* ───────── SCREEN SYSTEM ───────── */
-.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
-.screen.active{display:flex}
+/* ── shared controls ── */
+.card{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:12px;animation:up .25s ease}
+.card-t{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
+.card-t h3{font-size:15px;font-weight:600}
+.card-t span{font-size:12px;color:var(--mu);text-align:right}
+.link{font-size:13px;color:#a98bff;font-weight:600;white-space:nowrap}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:14px;font-weight:700;font-size:15px;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn-lime{background:var(--lime);color:var(--bg)}
+.btn-ghost{background:var(--s2);color:var(--tx)}
+.btn-danger{background:rgba(255,112,112,.12);color:var(--red)}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.f-l{font-size:13px;color:var(--mu);margin:16px 0 8px;font-weight:500}
+.f-l:first-child{margin-top:0}
+.f-in{width:100%;padding:12px 14px;border-radius:12px;background:var(--s2);border:1px solid transparent;color:var(--tx);outline:none;transition:border-color .2s}
+.f-in:focus{border-color:var(--vio)}
+.f-in::placeholder{color:var(--mu)}
+select.f-in{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mu) 50%),linear-gradient(135deg,var(--mu) 50%,transparent 50%);background-position:calc(100% - 18px) 52%,calc(100% - 13px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+input[type=date].f-in{color-scheme:dark;min-width:0;-webkit-appearance:none;appearance:none;min-height:46px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.grid2>*{min-width:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.ch{padding:8px 12px;border-radius:12px;background:var(--s2);font-size:14px;color:var(--tx2);border:1.5px solid transparent;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.ch.on{border-color:var(--lime);color:var(--tx);background:rgba(192,240,0,.08)}
+.ch.pool.on{border-color:var(--lime)}
+.seg{display:flex;background:var(--s2);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;padding:9px;border-radius:9px;font-size:14px;color:var(--mu);font-weight:500}
+.seg button.on{background:var(--s3);color:var(--tx)}
+.hint{font-size:12px;color:var(--mu);margin-top:8px}
+.av{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.mini-av{width:20px;height:20px;font-size:10px}
+.empty{text-align:center;padding:28px 12px;color:var(--mu)}
+.empty b{display:block;font-size:34px;margin-bottom:6px}
 
-/* ══════════════════════════════════
-   LANDING SCREEN
-══════════════════════════════════ */
-#s-landing{align-items:center;justify-content:center;padding:24px;background:var(--bg)}
-#s-landing::before{
-  content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse at 50% 0%,rgba(192,240,0,.06) 0%,rgba(139,92,246,.06) 50%,transparent 70%);
-  pointer-events:none
-}
-.land-inner{width:100%;max-width:380px;animation:fadeUp .5s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+/* ── landing ── */
+#s-landing .wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:40px}
+.logo{text-align:center;margin-bottom:28px}
+.logo-ic{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,var(--vio),var(--lime));display:inline-flex;align-items:center;justify-content:center;font-size:34px;box-shadow:0 0 40px rgba(192,240,0,.25);margin-bottom:14px}
+.logo h1{font-size:30px;font-weight:700;letter-spacing:-.5px}
+.logo h1 span{color:var(--lime)}
+.logo p{color:var(--mu);margin-top:2px}
+.code-in{width:100%;padding:14px;border-radius:14px;background:var(--s2);border:1px solid transparent;color:var(--tx);font-family:var(--num);font-size:26px;font-weight:700;letter-spacing:6px;text-align:center;text-transform:uppercase;outline:none;margin-bottom:10px}
+.code-in:focus{border-color:var(--vio)}
+.recent{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--s2);border-radius:14px;margin-bottom:6px;cursor:pointer}
+.recent-b{flex:1;min-width:0}
+.recent-b div{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recent-b small{color:var(--mu);font-size:12px}
+.recent-code{font-family:var(--num);font-weight:700;color:#a98bff;font-size:13px;letter-spacing:1px}
+.x{width:28px;height:28px;border-radius:8px;color:var(--mu);font-size:14px;flex-shrink:0}
+.x:hover{color:var(--red);background:rgba(255,112,112,.1)}
+.counter{text-align:center;font-size:13px;color:var(--mu);margin-top:14px}
 
-.land-logo{text-align:center;margin-bottom:36px}
-.land-logo-icon{
-  width:72px;height:72px;border-radius:22px;
-  background:linear-gradient(135deg,var(--purple),var(--accent));
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:32px;margin-bottom:14px;
-  box-shadow:0 0 40px rgba(192,240,0,.25),0 0 20px rgba(139,92,246,.2)
-}
-.land-logo h1{font-size:30px;font-weight:700;letter-spacing:-.5px}
-.land-logo h1 span{color:var(--accent)}
-.land-logo p{font-size:20px;color:var(--muted);margin-top:4px}
-
-.land-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius-lg);padding:20px;margin-bottom:12px
-}
-.land-card-title{font-size:18px;font-weight:700;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px}
-
-.btn{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:13px 20px;border-radius:var(--radius-sm);border:none;
-  font-family:var(--font);font-size:18px;font-weight:600;cursor:pointer;transition:all .2s
-}
-.btn-primary{background:var(--accent);color:var(--accent-dark);box-shadow:0 4px 20px rgba(192,240,0,.2);font-weight:700}
-.btn-primary:active{transform:scale(.97)}
-.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:active{background:var(--surface3)}
-
-.code-input{
-  width:100%;padding:14px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);color:var(--text);font-family:'Courier New',monospace;
-  font-size:30px;font-weight:700;letter-spacing:5px;text-align:center;text-transform:uppercase;
-  outline:none;transition:all .2s;margin-bottom:10px
-}
-.code-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
-
-/* ══════════════════════════════════
-   SETUP SCREEN
-══════════════════════════════════ */
-#s-setup{background:var(--bg);overflow-y:auto}
-.setup-wrap{max-width:480px;margin:0 auto;padding:20px 16px 40px}
-.setup-back{
-  display:inline-flex;align-items:center;gap:6px;background:none;border:none;
-  color:var(--muted);font-family:var(--font);font-size:20px;cursor:pointer;
-  padding:0;margin-bottom:20px
-}
-.setup-back:hover{color:var(--text)}
-.setup-head{margin-bottom:24px}
-.setup-head h2{font-size:20px;font-weight:700}
-.setup-head p{font-size:20px;color:var(--muted);margin-top:4px}
-
-.step-dots{display:flex;gap:6px;margin-bottom:24px}
-.sdot-step{height:4px;border-radius:2px;background:var(--border);transition:all .3s}
-.sdot-step.active{background:var(--accent);width:24px}
-.sdot-step.done{background:var(--accent)}
-.sdot-step:not(.active):not(.done){width:8px}
-.sdot-step.active{width:24px}
-
-.step-page{display:none;animation:fadeUp .3s ease}
-.step-page.active{display:block}
-
-.field{margin-bottom:14px}
-.field label{display:block;font-size:20px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-input,select,textarea{
-  width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:18px;outline:none;transition:all .2s
-}
-input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
-input::placeholder{color:var(--muted)}
-select option{background:var(--surface2)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-/* traveler chips */
-.traveler-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
-.traveler-row{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm)
-}
-.t-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0}
-.t-name{flex:1;font-size:18px;font-weight:500}
-.t-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;border-radius:4px;transition:color .2s}
-.t-del:hover{color:var(--red)}
+/* ── setup ── */
+.back{color:var(--mu);font-size:15px;padding:4px 0;margin-bottom:18px;display:inline-flex;gap:6px}
+.setup-h h2{font-size:24px;font-weight:700}
+.setup-h p{color:var(--mu);margin-top:2px}
+.dots{display:flex;gap:6px;margin:16px 0 22px}
+.dots i{display:block;height:4px;width:10px;border-radius:4px;background:var(--s3);transition:all .3s}
+.dots i.on{width:26px;background:var(--lime)}
+.dots i.past{background:var(--lime)}
+.step{display:none;animation:up .25s ease}
+.step.on{display:block}
+.step-nav{display:flex;gap:10px;margin-top:22px}
+.step-nav .btn-ghost{width:56px;flex-shrink:0}
+.mem-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border-radius:12px;margin-bottom:6px}
+.mem-row span.n{flex:1;font-weight:500}
 .add-row{display:flex;gap:8px}
-.add-row input{flex:1}
-.btn-icon{
-  padding:11px 14px;background:var(--surface3);border:1px solid var(--border);
-  border-radius:var(--radius-sm);color:var(--blue);cursor:pointer;font-size:18px;transition:all .2s
-}
-.btn-icon:hover{background:var(--blue-glow)}
-
-/* currency chips */
-.cur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
-.cur-chip{
-  padding:10px 6px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);cursor:pointer;text-align:center;transition:all .2s;
-  font-size:18px;font-weight:500
-}
-.cur-chip.on{background:var(--blue-glow);border-color:var(--accent);color:var(--accent)}
-
-/* extra cat chips */
-.extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.extra-chip{
-  padding:12px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);cursor:pointer;text-align:center;transition:all .2s
-}
-.extra-chip .ec-icon{font-size:30px;margin-bottom:4px}
-.extra-chip .ec-name{font-size:18px;font-weight:600}
-.extra-chip .ec-desc{font-size:18px;color:var(--muted);margin-top:2px}
-.extra-chip.on{border-color:var(--pink);background:rgba(244,114,182,.1)}
-
-.default-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
-.def-chip{
-  padding:5px 10px;background:var(--surface3);border:1px solid var(--border);
-  border-radius:20px;font-size:20px;color:var(--muted)
-}
-
-.step-nav{display:flex;gap:10px;margin-top:20px}
-.btn-back-step{padding:13px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);cursor:pointer;font-size:18px;flex-shrink:0;transition:all .2s}
-.btn-back-step:active{background:var(--surface3)}
-
-/* ══════════════════════════════════
-   APP SCREEN
-══════════════════════════════════ */
-#s-app{background:var(--bg)}
-
-/* HEADER */
-.app-hd{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:14px 16px 0;flex-shrink:0
-}
-.app-hd-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
-.app-title h2{font-size:18px;font-weight:700}
-.app-title .dest{font-size:20px;color:var(--muted);margin-top:2px}
-.code-badge{
-  font-family:'Courier New',monospace;font-size:18px;font-weight:700;
-  letter-spacing:1.5px;padding:3px 8px;background:var(--surface2);
-  border:1px solid var(--purple);border-radius:6px;color:var(--purple);
-  cursor:pointer;transition:all .2s;margin-top:2px;display:inline-block
-}
-.code-badge:hover{background:var(--blue-glow)}
-.status-pill{
-  display:flex;align-items:center;gap:5px;background:var(--surface2);
-  border:1px solid var(--border);border-radius:20px;padding:4px 10px;
-  font-size:20px;color:var(--muted);flex-shrink:0
-}
-.s-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:background .3s;flex-shrink:0}
-.s-dot.live{background:var(--accent);animation:blink 2s infinite}
-.s-dot.err{background:var(--red)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* SUMMARY STRIP */
-.sum-strip{
-  display:grid;gap:1px;background:var(--border);border-top:1px solid var(--border);
-  flex-shrink:0
-}
-.sum-cell{background:var(--surface);padding:10px 12px;text-align:center}
-.sum-label{font-size:20px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
-.sum-value{font-size:20px;font-weight:700}
-.sum-sub{font-size:18px;color:var(--muted);margin-top:2px}
-
-/* CUR TOGGLE in strip */
-.cur-toggle-btn{
-  background:var(--surface2);border:1px solid var(--purple);border-radius:6px;
-  color:var(--purple);font-family:var(--font);font-size:18px;font-weight:700;
-  padding:4px 8px;cursor:pointer;white-space:nowrap;transition:all .2s;align-self:center
-}
-.cur-toggle-btn.active{background:var(--blue-glow);border-color:var(--purple)}
-
-/* TAB BAR */
-.tab-bar{
-  display:flex;background:var(--border);gap:1px;
-  border-bottom:1px solid var(--border);flex-shrink:0
-}
-.tab-btn{
-  flex:1;padding:10px 4px;background:var(--surface);border:none;
-  color:var(--muted);font-family:var(--font);font-size:20px;font-weight:600;
-  cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-align:center
-}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface)}
-.tab-btn:hover:not(.active){color:var(--text2)}
-
-/* TAB CONTENTS */
-.tab-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.tab-pane{display:none;padding:16px}
-.tab-pane.active{display:block}
-
-/* ── ADD TAB ── */
-.add-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px}
-.add-card-title{font-size:20px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
-.add-top-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-
-.cat-grid-app{display:grid;gap:5px;margin-bottom:4px}
-.cat-btn-app{
-  padding:7px 4px;background:var(--surface2);border:2px solid transparent;
-  border-radius:var(--radius-sm);cursor:pointer;text-align:center;transition:all .2s
-}
-.cat-btn-app .ci{font-size:16px;display:block;margin-bottom:2px}
-.cat-btn-app .cl{font-size:9px;font-weight:600;color:var(--muted)}
-.cat-btn-app.on .cl{color:inherit}
-
-.payer-row{display:flex;gap:8px;flex-wrap:wrap}
-.payer-chip{
-  display:flex;align-items:center;gap:6px;padding:7px 12px;
-  background:var(--surface2);border:1px solid var(--border);border-radius:20px;
-  cursor:pointer;font-size:20px;font-weight:500;transition:all .2s
-}
-.payer-chip.on{border-width:2px}
-.payer-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700}
-
-.pay-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.pay-btn{
-  padding:9px 6px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);color:var(--muted);cursor:pointer;font-size:20px;
-  font-weight:600;text-align:center;transition:all .2s
-}
-.pay-btn.on{border-color:var(--green);background:var(--green-glow);color:var(--green)}
-
-.field-label{font-size:18px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:14px}
-.field-label:first-of-type{margin-top:0}
-
-.amount-row{display:flex;gap:8px}
-.amount-row input{flex:1}
-.amount-row select{width:90px;flex-shrink:0}
-
-/* ── LIST TAB ── */
-.day-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none}
-.day-scroll::-webkit-scrollbar{display:none}
-.day-chip-filter{
-  padding:6px 12px;background:var(--surface);border:1px solid var(--border);
-  border-radius:20px;font-size:18px;font-weight:500;color:var(--muted);
-  cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s
-}
-.day-chip-filter.active{background:var(--blue-glow);border-color:var(--accent);color:var(--accent)}
-
-.list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.list-title{font-size:20px;font-weight:700}
-.list-count{font-size:18px;color:var(--muted)}
-
-.expense-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;
-  animation:fadeUp .2s ease
-}
-.e-day-badge{
-  width:36px;height:36px;border-radius:10px;background:var(--surface3);
-  display:flex;align-items:center;justify-content:center;font-size:20px;
-  font-weight:700;color:var(--muted);flex-shrink:0;font-family:'Courier New',monospace
-}
-.e-body{flex:1;min-width:0}
-.e-name{font-size:18px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.e-tags{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap}
-.e-tag{font-size:18px;font-weight:600;padding:2px 7px;border-radius:20px}
-.e-note{font-size:20px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.e-right{text-align:right;flex-shrink:0}
-.e-amt{font-size:18px;font-weight:700}
-.e-sub{font-size:18px;color:var(--muted);margin-top:2px}
-.e-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:6px;border-radius:6px;transition:all .2s;margin-left:4px}
-.e-del:hover{color:var(--red);background:rgba(248,81,73,.1)}
-
-.day-divider{
-  font-size:18px;font-weight:700;color:var(--accent);letter-spacing:.5px;
-  padding:12px 0 6px;display:flex;align-items:center;gap:8px
-}
-.day-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-
-.empty{text-align:center;padding:60px 20px;color:var(--muted)}
-.empty-icon{font-size:40px;margin-bottom:10px}
-.empty p{font-size:20px}
-
-/* ── SUMMARY TAB ── */
-.sum-section-title{font-size:18px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px}
-.sum-section-title:first-child{margin-top:0}
-
-/* rate card */
-.rate-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px}
+.add-row .f-in{flex:1}
+.add-row .btn{width:auto;padding:0 18px}
+.mode-card{display:block;width:100%;text-align:left;padding:16px;border-radius:16px;background:var(--s2);border:1.5px solid transparent;margin-bottom:10px}
+.mode-card.on{border-color:var(--lime);background:rgba(192,240,0,.06)}
+.mode-card b{display:block;font-size:16px;margin-bottom:2px}
+.mode-card small{color:var(--tx2);font-size:13px}
 .rate-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.rate-label{font-size:18px;font-weight:700;color:var(--orange);width:40px;flex-shrink:0}
-.rate-eq{font-size:18px;color:var(--muted);flex:1}
-.rate-inp{flex:0 0 100px;padding:8px 10px;text-align:right;font-family:'Courier New',monospace;font-size:20px}
-.rate-unit{font-size:20px;color:var(--muted);flex-shrink:0;width:36px}
-.rate-reset{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px;border-radius:4px;transition:color .2s}
-.rate-reset.edited{color:var(--orange)}
-.rate-hint{font-size:18px;color:var(--muted)}
+.rate-row .cur{font-weight:700;width:46px;color:var(--amber)}
+.rate-row .eq{color:var(--mu);font-size:14px;flex:1}
+.rate-row .f-in{width:110px;flex:0 0 110px;text-align:right;font-family:var(--num)}
+.rate-row .unit{color:var(--mu);width:34px;font-size:14px}
 
-/* chart */
-.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:8px}
-.chart-inner{display:flex;align-items:center;gap:16px}
-.chart-canvas-wrap{width:130px;height:130px;flex-shrink:0}
-.chart-legend{flex:1}
-.legend-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;font-size:18px}
-.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:6px}
-.legend-name{flex:1;color:var(--text2)}
-.legend-pct{font-weight:700;margin-right:6px}
-.legend-val{color:var(--muted)}
+/* ── app ── */
+#s-app .wrap{padding-bottom:120px}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.hd-l{min-width:0}
+.hd-sub{font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd h1{font-size:26px;font-weight:700;line-height:1.2;word-break:break-word}
+.hd-act{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:4px}
+.live{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2)}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--mu)}
+.live.on i{background:var(--lime);box-shadow:0 0 8px var(--lime)}
+.live.off i{background:var(--red)}
+.icon-btn{height:36px;min-width:36px;padding:0 10px;border-radius:10px;background:var(--s2);font-weight:700;font-size:13px;color:var(--tx2)}
+.icon-btn.lime{background:var(--lime);color:var(--bg);font-size:16px}
+.meta{display:flex;align-items:center;gap:14px;margin:14px 0 18px}
+.avs{display:flex}
+.avs .av{border:2px solid var(--bg)}
+.avs .av+.av{margin-left:-8px}
+.avs .more{background:var(--s3);color:var(--tx2)}
+.prog{flex:1}
+.prog-t{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:6px}
+.prog-t b{color:var(--tx2);font-weight:600}
+.bar{height:6px;border-radius:6px;background:var(--s2);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:6px;background:var(--lime);transition:width .5s}
 
-/* payer cards */
-.payer-card-sum{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px
-}
-.p-av-big{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
-.p-info{flex:1}
-.p-name{font-size:20px;font-weight:600}
-.p-count{font-size:20px;color:var(--muted);margin-top:2px}
-.p-total{text-align:right}
-.p-main{font-size:20px;font-weight:700}
-.p-sub{font-size:18px;color:var(--muted);margin-top:2px}
+.view{display:none}
+.view.on{display:block}
 
-/* cat accordion */
-.cat-acc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
-.cat-acc-hd{
-  display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;transition:background .2s
-}
-.cat-acc-hd:hover{background:var(--surface2)}
-.cat-acc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.cat-acc-name{flex:1;font-size:20px;font-weight:600}
-.cat-acc-pct{font-size:20px;color:var(--muted);margin-right:8px}
-.cat-acc-amt{font-size:20px;font-weight:700;margin-right:8px}
-.cat-acc-arr{font-size:18px;color:var(--muted);transition:transform .2s}
-.cat-acc.open .cat-acc-arr{transform:rotate(180deg)}
-.cat-acc-body{display:none;border-top:1px solid var(--border);padding:8px 14px}
-.cat-acc.open .cat-acc-body{display:block}
-.cat-acc-item{padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.cat-acc-item:last-child{border-bottom:none}
-.acc-day{font-size:18px;font-weight:700;color:var(--muted);width:24px;flex-shrink:0;font-family:'Courier New',monospace}
-.acc-name{flex:1;font-size:18px;font-weight:500}
-.acc-amt{font-size:18px;font-weight:700;text-align:right}
+.hero{position:relative;overflow:hidden;background:linear-gradient(150deg,#1d1d55 0%,#13133a 60%);border:1px solid rgba(192,240,0,.15)}
+.hero::after{content:'';position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(192,240,0,.14),transparent 70%);pointer-events:none}
+.hero-l{font-size:13px;color:var(--tx2)}
+.hero-v{font-size:40px;font-weight:700;color:var(--lime);line-height:1.15;margin-top:4px;word-break:break-all}
+.hero-v.neg{color:var(--red)}
+.hero-s{font-size:14px;color:var(--mu);margin-top:2px}
+.hero-bar{height:10px;border-radius:10px;background:rgba(255,255,255,.08);margin:18px 0 10px;overflow:hidden;display:flex}
+.hero-bar i{display:block;height:100%}
+.hero-row{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--tx2)}
+.hero-row b{font-family:var(--num);color:var(--tx);font-weight:600}
+.hero-act{display:flex;gap:8px;margin-top:16px;position:relative;z-index:1}
+.hero-act .btn{padding:11px;font-size:14px}
+.warn{margin-top:14px;padding:10px 12px;border-radius:12px;background:rgba(240,165,0,.1);color:var(--amber);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:12px;min-width:0}
+.stat-l{font-size:12px;color:var(--mu)}
+.stat-v{font-size:16px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-s{font-size:11px;color:var(--mu)}
 
-/* day bars */
-.day-bar{margin-bottom:10px}
-.day-bar-hd{display:flex;justify-content:space-between;font-size:18px;margin-bottom:4px}
-.day-bar-lbl{color:var(--text2)}
-.day-bar-val{font-weight:700}
-.day-bar-track{height:6px;background:var(--surface3);border-radius:3px}
-.day-bar-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .5s}
+.tx{display:flex;align-items:center;gap:8px;padding:12px;border-radius:14px;background:var(--s2);margin-bottom:8px}
+.tx-arrow{color:var(--mu);font-size:13px}
+.tx-names{flex:1;font-size:14px;min-width:0}
+.tx-names small{display:block;color:var(--mu);font-size:12px}
+.tx-amt{text-align:right;flex-shrink:0}
+.tx-amt b{display:block;font-size:16px}
+.tx-amt small{font-size:12px;color:var(--mu)}
+.done{padding:14px;text-align:center;color:var(--tx2);font-size:14px;background:var(--s2);border-radius:14px;margin-bottom:8px}
+.sub-h{font-size:13px;font-weight:600;color:var(--tx2);margin:16px 0 8px;display:flex;justify-content:space-between}
+.sub-h:first-child{margin-top:0}
 
-/* ── MODALS ── */
-.modal-bg{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
-  z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)
-}
-.modal-bg.open{display:flex}
-.modal-box{
-  background:var(--surface);border:1px solid var(--border2);border-radius:20px;
-  padding:28px;max-width:340px;width:100%;text-align:center;animation:fadeUp .25s ease
-}
-.modal-code{
-  font-family:'Courier New',monospace;font-size:30px;font-weight:700;
-  letter-spacing:6px;color:var(--blue);padding:16px;background:var(--surface2);
-  border-radius:var(--radius);margin:14px 0;border:1px solid var(--border2)
-}
-.modal-hint{font-size:18px;color:var(--muted);margin-bottom:18px}
-.modal-btn{
-  padding:10px 20px;background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);color:var(--text);cursor:pointer;font-family:var(--font);
-  font-size:20px;font-weight:600;transition:all .2s;margin:4px
-}
-.modal-btn:hover{background:var(--surface3)}
+.mem{display:flex;align-items:center;gap:12px;padding:10px 0}
+.mem+.mem{border-top:1px solid var(--line)}
+.mem .av{width:38px;height:38px;font-size:15px}
+.mem-b{flex:1;min-width:0}
+.mem-n{font-weight:600}
+.mem-d{font-size:12px;color:var(--mu)}
+.pill{font-family:var(--num);font-weight:600;font-size:13px;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.pos{background:rgba(192,240,0,.12);color:var(--lime)}
+.neg{background:rgba(255,112,112,.12);color:var(--red)}
+.zero{background:var(--s2);color:var(--mu)}
 
-/* ── TOAST ── */
-#toast-wrap{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:300;pointer-events:none}
-.toast{
-  background:var(--surface3);border:1px solid var(--border2);color:var(--text);
-  padding:10px 18px;border-radius:20px;font-size:20px;font-weight:500;
-  white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4);
-  animation:toastIn .25s ease;margin-bottom:6px
-}
-@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.cat{margin-bottom:12px}
+.cat:last-child{margin-bottom:0}
+.cat-h{display:flex;justify-content:space-between;gap:8px;font-size:14px;margin-bottom:6px}
+.cat-h span:last-child{font-family:var(--num);color:var(--tx2);white-space:nowrap}
+.cat-h em{font-style:normal;color:var(--mu);font-size:12px;margin-left:6px}
+.cat .bar{height:8px}
 
-/* ── RESPONSIVE ── */
-@media(min-width:768px){
-  .tab-body{display:grid;grid-template-columns:400px 1fr;gap:0;align-items:start;overflow:hidden}
-  .tab-pane{display:block !important;overflow-y:auto;height:100%}
-  .tab-bar{display:none}
-  .cur-grid{grid-template-columns:repeat(4,1fr)}
-}
-@media(max-width:380px){
-  .cat-grid-app{grid-template-columns:repeat(3,1fr)}
-  .sum-value{font-size:20px}
+.ex{display:flex;align-items:center;gap:12px;padding:11px 0;cursor:pointer;width:100%;text-align:left}
+.ex+.ex{border-top:1px solid var(--line)}
+.ex-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.ex-b{flex:1;min-width:0}
+.ex-n{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex-m{font-size:12px;color:var(--mu);display:flex;align-items:center;gap:5px;margin-top:2px;flex-wrap:wrap}
+.chip{font-size:11px;padding:1px 7px;border-radius:20px;background:var(--s2);color:var(--tx2)}
+.ex-r{text-align:right;flex-shrink:0}
+.ex-r b{font-family:var(--num);font-weight:600;display:block}
+.ex-r small{font-size:12px;color:var(--mu)}
+
+.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:0 -16px 14px;padding-left:16px;padding-right:16px;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}
+.days::-webkit-scrollbar{display:none}
+.day-c{padding:7px 12px;border-radius:20px;background:var(--s1);border:1px solid var(--line);font-size:13px;color:var(--tx2);white-space:nowrap;flex-shrink:0}
+.day-c.on{border-color:var(--lime);color:var(--lime);background:rgba(192,240,0,.08)}
+.day-c.dim{opacity:.4}
+.day-h{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--lime);margin:16px 0 4px}
+.day-h::after{content:'';flex:1;height:1px;background:var(--line)}
+.day-h em{font-style:normal;font-family:var(--num);color:var(--mu);font-weight:500;order:2}
+.list-card{padding:6px 16px}
+
+.share-code{font-family:var(--num);font-size:30px;font-weight:700;letter-spacing:6px;color:#a98bff;text-align:center;padding:14px;background:var(--s2);border-radius:14px;margin-bottom:10px}
+
+/* ── nav ── */
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:460px;padding:10px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 35%);z-index:40}
+.nav-in{display:flex;align-items:center;justify-content:space-around;background:rgba(26,26,74,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:22px;padding:8px}
+.nav-b{display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--mu);gap:2px;padding:4px 6px;min-width:56px}
+.nav-b span{font-size:19px;filter:grayscale(.6);opacity:.8}
+.nav-b.on{color:var(--lime)}
+.nav-b.on span{filter:none;opacity:1}
+.fab{width:56px;height:56px;border-radius:18px;background:var(--lime);color:var(--bg);font-size:30px;font-weight:600;box-shadow:0 6px 24px rgba(192,240,0,.35);margin-top:-28px;flex-shrink:0}
+
+/* ── sheets ── */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+.ov.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);width:100%;max-width:460px;background:var(--s1);border-radius:24px 24px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));z-index:60;transition:transform .3s ease,visibility 0s linear .3s;visibility:hidden;max-height:92vh;overflow-y:auto;overscroll-behavior:contain}
+.sheet.open{transform:translate(-50%,0);visibility:visible;transition:transform .3s ease}
+.grab{width:40px;height:4px;border-radius:4px;background:var(--s3);margin:0 auto 12px}
+.sheet-t{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sheet-t h3{font-size:17px}
+.amt-in{display:flex;align-items:baseline;justify-content:center;gap:6px;padding:4px 0}
+.amt-in .sym{font-family:var(--num);font-size:30px;color:var(--mu);font-weight:600}
+.amt-in input{background:none;border:none;outline:none;color:var(--tx);font-family:var(--num);font-size:44px;font-weight:700;width:2ch;max-width:75%;text-align:left;padding:0}
+.amt-in input::-webkit-outer-spin-button,.amt-in input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.amt-in input[type=number]{-moz-appearance:textfield}
+.amt-cur{display:flex;gap:6px;justify-content:center;margin-bottom:6px;flex-wrap:wrap}
+.amt-cur button{font-size:13px;font-weight:600;padding:5px 12px;border-radius:20px;background:var(--s2);color:var(--tx2)}
+.amt-cur button.on{background:rgba(192,240,0,.12);color:var(--lime)}
+.amt-conv{text-align:center;font-size:13px;color:var(--mu);min-height:18px;margin-bottom:10px}
+.pool-warn{display:none;margin:10px 0 4px;padding:12px;border-radius:12px;background:rgba(240,165,0,.1);color:var(--amber);font-size:13px}
+.pool-warn.show{display:block}
+.pool-warn .grid2{margin-top:10px}
+.pool-warn .btn{padding:10px;font-size:13px}
+
+/* ── toast ── */
+.toast{position:fixed;left:50%;bottom:108px;transform:translate(-50%,10px);background:var(--s3);border:1px solid var(--line);padding:10px 14px 10px 16px;border-radius:20px;font-size:14px;opacity:0;transition:all .2s;pointer-events:none;z-index:80;display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{color:var(--lime);font-weight:700;font-size:14px;white-space:nowrap}
+
+@media(min-width:900px){
+  #s-app .wrap{max-width:520px}
 }
 </style>
 </head>
 <body>
 
-<!-- ══ LANDING ══ -->
+<!-- ══════════ LANDING ══════════ -->
 <div id="s-landing" class="screen active">
-  <div class="land-inner">
-    <div class="land-logo">
-      <div class="land-logo-icon">
-        <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- wallet body -->
-          <rect x="2" y="11" width="22" height="15" rx="3" fill="#0d0d2b" stroke="#c0f000" stroke-width="1.8"/>
-          <rect x="2" y="11" width="22" height="6" rx="3" fill="#c0f00025" stroke="#c0f000" stroke-width="1.5"/>
-          <circle cx="20" cy="19" r="2.2" fill="#c0f000"/>
-          <!-- calculator -->
-          <rect x="21" y="19" width="15" height="17" rx="2.5" fill="#1a1a4a" stroke="#8b5cf6" stroke-width="1.6"/>
-          <rect x="23" y="21" width="11" height="4" rx="1" fill="#8b5cf630"/>
-          <text x="24" y="24.5" font-family="monospace" font-size="3.8" fill="#c0f000" font-weight="bold">123</text>
-          <rect x="23" y="27" width="3" height="2" rx=".5" fill="#8b5cf6" opacity=".8"/>
-          <rect x="27" y="27" width="3" height="2" rx=".5" fill="#8b5cf6" opacity=".8"/>
-          <rect x="31" y="27" width="3" height="2" rx=".5" fill="#c0f000"/>
-          <rect x="23" y="30.5" width="3" height="2" rx=".5" fill="#8b5cf6" opacity=".8"/>
-          <rect x="27" y="30.5" width="3" height="2" rx=".5" fill="#8b5cf6" opacity=".8"/>
-          <rect x="31" y="30.5" width="3" height="2" rx=".5" fill="#c0f000"/>
-        </svg>
-      </div>
-      <h1>Jodyub</h1>
-      <p>Track & split travel expenses</p>
+  <div class="wrap">
+    <div class="logo">
+      <div class="logo-ic">🧾</div>
+      <h1>Jody<span>ub</span></h1>
+      <p>จดค่าใช้จ่ายทริป · หารกันง่ายๆ</p>
     </div>
 
-    <div class="land-card">
-      <div class="land-card-title">🆕 สร้างทริปใหม่</div>
-      <button class="btn btn-primary" id="btn-new-trip">➕ สร้างทริปใหม่</button>
+    <div class="card">
+      <button class="btn btn-lime" data-act="new-trip">➕ สร้างทริปใหม่</button>
     </div>
 
-    <div class="land-card">
-      <div class="land-card-title">🔑 เข้าร่วมทริป</div>
-      <input class="code-input" id="join-input" type="text" maxlength="6" placeholder="XXXXXX">
-      <button class="btn btn-secondary" id="btn-join">🚀 เข้าร่วม</button>
+    <div class="card">
+      <div class="card-t"><h3>🔑 เข้าร่วมทริป</h3><span>ใส่โค้ด 6 ตัวจากเพื่อน</span></div>
+      <input class="code-in" id="join-input" type="text" maxlength="6" placeholder="XXXXXX" autocomplete="off" autocapitalize="characters">
+      <button class="btn btn-ghost" data-act="join" id="btn-join">เข้าร่วม →</button>
     </div>
 
-    <!-- recent trips -->
-    <div id="recent-trips-wrap" class="land-card" style="display:none"></div>
-
-    <!-- counter ล่างสุด subtle -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%">
-      <span style="font-size:20px">🗺️</span>
-      <span style="font-size:20px;color:var(--muted)">ทริปที่สร้างไปแล้ว</span>
-      <span id="trip-counter" style="font-size:18px;font-weight:700;color:var(--muted)">24 ทริป</span>
+    <div class="card" id="recent-card" style="display:none">
+      <div class="card-t"><h3>🕐 ทริปล่าสุด</h3></div>
+      <div id="recent-list"></div>
     </div>
+
+    <div class="counter">🗺️ สร้างไปแล้ว <b id="trip-counter" class="num">—</b> ทริป</div>
   </div>
 </div>
 
-<!-- ══ SETUP ══ -->
+<!-- ══════════ SETUP ══════════ -->
 <div id="s-setup" class="screen">
-  <div class="setup-wrap">
-    <button class="setup-back" id="setup-back">← กลับ</button>
-    <div class="setup-head">
-      <h2>สร้างทริปใหม่</h2>
-      <p>ตั้งค่าทริปของคุณ</p>
-    </div>
-    <div class="step-dots" id="step-dots"></div>
+  <div class="wrap">
+    <button class="back" data-act="setup-back">← กลับ</button>
+    <div class="setup-h"><h2>สร้างทริปใหม่</h2><p id="setup-sub">ข้อมูลทริป</p></div>
+    <div class="dots" id="dots"></div>
 
-    <!-- Step 0: Trip info -->
-    <div class="step-page active" id="sp-0">
-      <div class="field"><label>ชื่อทริป</label>
-        <input id="s-name" type="text" placeholder="เช่น Korea Trip 2026 🇰🇷">
-      </div>
+    <!-- 0: info -->
+    <div class="step on" data-step="0">
+      <div class="f-l">ชื่อทริป</div>
+      <input class="f-in" id="s-name" placeholder="เช่น Sendai 2027 🇯🇵" maxlength="60">
+      <div class="f-l">จุดหมาย</div>
+      <input class="f-in" id="s-dest" placeholder="เช่น Japan 🇯🇵" maxlength="60">
       <div class="grid2">
-        <div class="field"><label>วันเริ่มต้น</label><input id="s-start" type="date"></div>
-        <div class="field"><label>วันสิ้นสุด</label><input id="s-end" type="date"></div>
+        <div><div class="f-l">วันเริ่ม</div><input class="f-in" id="s-start" type="date"></div>
+        <div><div class="f-l">วันสุดท้าย</div><input class="f-in" id="s-end" type="date"></div>
       </div>
-      <div class="field"><label>จุดหมาย</label>
-        <input id="s-dest" type="text" placeholder="เช่น South Korea 🇰🇷">
-      </div>
-      <button class="btn btn-primary" id="sp0-next">ถัดไป →</button>
+      <div class="step-nav"><button class="btn btn-lime" data-act="step-next">ถัดไป →</button></div>
     </div>
 
-    <!-- Step 1: Travelers -->
-    <div class="step-page" id="sp-1">
-      <div class="field"><label>ผู้เดินทาง</label>
-        <div class="traveler-list" id="traveler-list"></div>
-        <div class="add-row">
-          <input id="traveler-inp" type="text" placeholder="ชื่อผู้เดินทาง">
-          <button class="btn-icon" id="traveler-add">+</button>
-        </div>
+    <!-- 1: members -->
+    <div class="step" data-step="1">
+      <div class="f-l">ใครไปบ้าง</div>
+      <div id="s-members"></div>
+      <div class="add-row">
+        <input class="f-in" id="s-mem-in" placeholder="ชื่อเพื่อน" maxlength="20">
+        <button class="btn btn-ghost" data-act="s-add-mem">เพิ่ม</button>
       </div>
-      <div class="step-nav">
-        <button class="btn-back-step" id="sp1-prev">←</button>
-        <button class="btn btn-primary" id="sp1-next">ถัดไป →</button>
-      </div>
+      <div class="hint">เพิ่มคนกลางทริปทีหลังได้</div>
+      <div class="step-nav"><button class="btn btn-ghost" data-act="step-prev">←</button><button class="btn btn-lime" data-act="step-next">ถัดไป →</button></div>
     </div>
 
-    <!-- Step 2: Currencies -->
-    <div class="step-page" id="sp-2">
-      <div class="field"><label>สกุลเงิน (เลือกได้หลายอัน)</label>
-        <div class="cur-grid" id="cur-grid">
-          <div class="cur-chip on" data-cur="THB">🇹🇭 THB</div>
-          <div class="cur-chip" data-cur="KRW">🇰🇷 KRW</div>
-          <div class="cur-chip" data-cur="JPY">🇯🇵 JPY</div>
-          <div class="cur-chip" data-cur="USD">🇺🇸 USD</div>
-          <div class="cur-chip" data-cur="EUR">🇪🇺 EUR</div>
-          <div class="cur-chip" data-cur="GBP">🇬🇧 GBP</div>
-          <div class="cur-chip" data-cur="CNY">🇨🇳 CNY</div>
-          <div class="cur-chip" data-cur="SGD">🇸🇬 SGD</div>
-        </div>
+    <!-- 2: currency -->
+    <div class="step" data-step="2">
+      <div class="f-l">ใช้เงินสกุลไหนบ้าง</div>
+      <div class="chips" id="s-curs"></div>
+      <div class="f-l">สรุปเป็นเงิน</div>
+      <select class="f-in" id="s-base">
+        <option value="THB">฿ THB — บาทไทย</option>
+        <option value="USD">$ USD — US Dollar</option>
+      </select>
+      <div id="s-rates-wrap">
+        <div class="f-l">เรทที่แลกมา</div>
+        <div id="s-rates"></div>
+        <div class="hint" id="s-rate-hint">ใส่เรทเดียวใช้ทั้งทริป แก้ทีหลังได้ในแท็บ ⚙️ ทริป</div>
       </div>
-      <div class="field"><label>แสดงผลเป็น (Base Currency)</label>
-        <select id="s-base">
-          <option value="THB">THB — บาทไทย</option>
-          <option value="USD">USD — US Dollar</option>
-        </select>
-      </div>
-      <div class="step-nav">
-        <button class="btn-back-step" id="sp2-prev">←</button>
-        <button class="btn btn-primary" id="sp2-next">ถัดไป →</button>
-      </div>
+      <div class="step-nav"><button class="btn btn-ghost" data-act="step-prev">←</button><button class="btn btn-lime" data-act="step-next">ถัดไป →</button></div>
     </div>
 
-    <!-- Step 3: Extra categories -->
-    <div class="step-page" id="sp-3">
-      <div class="field">
-        <label>หมวดหลัก (มีให้ทุกทริป)</label>
-        <div class="default-cats">
-          <div class="def-chip">🍜 Food & Drink</div>
-          <div class="def-chip">🛍 Shopping</div>
-          <div class="def-chip">🎁 Souvenir</div>
-          <div class="def-chip">🚌 Transport</div>
-          <div class="def-chip">🏨 Accommodation</div>
-          <div class="def-chip">🎡 Activity</div>
-          <div class="def-chip">📦 Other</div>
-        </div>
-        <label style="margin-top:14px;">หมวดพิเศษ (ไม่บังคับ)</label>
-        <div class="extra-grid" id="extra-grid">
-          <div class="extra-chip" data-cat="aesthetic">
-            <div class="ec-icon">💉</div>
-            <div class="ec-name">Aesthetic Clinic</div>
-            <div class="ec-desc">โบท็อก ฟิลเลอร์ คลินิก</div>
-          </div>
-          <div class="extra-chip" data-cat="snack">
-            <div class="ec-icon">🍿</div>
-            <div class="ec-name">Snack & Street</div>
-            <div class="ec-desc">ของกินเล่น ตลาด</div>
-          </div>
-          <div class="extra-chip" data-cat="entertainment">
-            <div class="ec-icon">🎰</div>
-            <div class="ec-name">Entertainment</div>
-            <div class="ec-desc">คอนเสิร์ต บาร์</div>
-          </div>
-          <div class="extra-chip" data-cat="outdoor">
-            <div class="ec-icon">⛷️</div>
-            <div class="ec-name">Outdoor</div>
-            <div class="ec-desc">ธรรมชาติ ผจญภัย</div>
-          </div>
-          <div class="extra-chip" data-cat="photobooth">
-            <div class="ec-icon">📸</div>
-            <div class="ec-name">Photo Booth</div>
-            <div class="ec-desc">ถ่ายรูป สตูดิโอ</div>
-          </div>
-          <div class="extra-chip" data-cat="health">
-            <div class="ec-icon">💊</div>
-            <div class="ec-name">Health</div>
-            <div class="ec-desc">ยา หมอ ประกัน</div>
-          </div>
-        </div>
+    <!-- 3: mode -->
+    <div class="step" data-step="3">
+      <div class="f-l">ทริปนี้จ่ายกันแบบไหน</div>
+      <button class="mode-card on" data-act="s-mode" data-mode="split"><b>🤝 ต่างคนต่างจ่าย</b><small>ใครจ่ายก็จดไว้ จบทริปสรุปให้ว่าใครโอนให้ใครเท่าไหร่</small></button>
+      <button class="mode-card" data-act="s-mode" data-mode="pool"><b>💰 เก็บเงินกองกลาง</b><small>ทุกคนลงเงินรวมกัน ใช้จ่ายจากกอง เหลือเท่าไหร่คืนตอนจบ</small></button>
+      <div id="s-pool-init" style="display:none">
+        <div class="f-l">เก็บกองแรกคนละเท่าไหร่ (ไม่บังคับ)</div>
+        <input class="f-in num" id="s-pool-amt" type="number" inputmode="decimal" placeholder="0">
+        <div class="hint" id="s-pool-hint"></div>
       </div>
-      <div class="step-nav">
-        <button class="btn-back-step" id="sp3-prev">←</button>
-        <button class="btn btn-primary" id="btn-create-trip">🚀 สร้างทริป!</button>
-      </div>
+      <div class="hint">เปลี่ยนโหมดทีหลังได้</div>
+      <div class="step-nav"><button class="btn btn-ghost" data-act="step-prev">←</button><button class="btn btn-lime" data-act="step-next">ถัดไป →</button></div>
+    </div>
+
+    <!-- 4: categories -->
+    <div class="step" data-step="4">
+      <div class="f-l">หมวดหลัก (มีทุกทริป)</div>
+      <div class="chips" id="s-cats-def"></div>
+      <div class="f-l">หมวดเสริม (เลือกได้)</div>
+      <div class="chips" id="s-cats-extra"></div>
+      <div class="step-nav"><button class="btn btn-ghost" data-act="step-prev">←</button><button class="btn btn-lime" data-act="create-trip" id="btn-create">🚀 สร้างทริป</button></div>
     </div>
   </div>
 </div>
 
-<!-- ══ APP ══ -->
+<!-- ══════════ APP ══════════ -->
 <div id="s-app" class="screen">
-
-  <!-- header -->
-  <div class="app-hd" id="app-hd">
-    <div class="app-hd-top">
-      <div class="app-title">
-        <h2 id="app-name">—</h2>
-        <div><span class="code-badge" id="app-code" title="คลิกดู Trip Code">●●●●●●</span>
-        <button id="btn-share-trip" onclick="shareTrip()" style="margin-left:6px;padding:3px 8px;background:var(--accent);border:none;border-radius:6px;color:var(--accent-dark);font-size:18px;font-weight:700;cursor:pointer;font-family:var(--font)">🔗 แชร์</button></div>
+  <div class="wrap">
+    <header class="hd">
+      <div class="hd-l">
+        <div class="hd-sub" id="hd-sub"></div>
+        <h1 id="hd-name">—</h1>
       </div>
-      <div class="status-pill" id="status-pill">
-        <div class="s-dot" id="s-dot"></div>
-        <span id="s-txt">localStorage</span>
+      <div class="hd-act">
+        <span class="live" id="live"><i></i><span id="live-t">…</span></span>
+        <button class="icon-btn" id="cur-toggle" data-act="toggle-cur" style="display:none"></button>
+        <button class="icon-btn lime" data-act="share" aria-label="แชร์ทริป">↗</button>
+      </div>
+    </header>
+    <div class="meta">
+      <div class="avs" id="hd-avs"></div>
+      <div class="prog">
+        <div class="prog-t"><span id="prog-l">ความคืบหน้าทริป</span><b id="prog-r"></b></div>
+        <div class="bar"><i id="prog-bar" style="width:0"></i></div>
       </div>
     </div>
 
-    <!-- summary strip -->
-    <div class="sum-strip" id="sum-strip">
-      <!-- rendered by JS -->
-    </div>
-
-    <!-- tab bar -->
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="add">➕ เพิ่ม</button>
-      <button class="tab-btn" data-tab="list">📋 รายการ</button>
-      <button class="tab-btn" data-tab="summary">📊 สรุป</button>
-    </div>
+    <section class="view on" id="v-home"></section>
+    <section class="view" id="v-list"></section>
+    <section class="view" id="v-settle"></section>
+    <section class="view" id="v-trip"></section>
   </div>
 
-  <!-- tab body -->
-  <div class="tab-body">
-
-    <!-- ADD -->
-    <div class="tab-pane active" id="tab-add">
-      <div class="add-card">
-        <div class="add-card-title">🧾 เพิ่มค่าใช้จ่าย</div>
-
-        <div class="add-top-row">
-          <div>
-            <div class="field-label">วัน</div>
-            <select id="f-day"></select>
-          </div>
-          <div>
-            <div class="field-label">สกุลเงิน</div>
-            <select id="f-cur"></select>
-          </div>
-        </div>
-
-        <div class="field-label">หมวดหมู่</div>
-        <div class="cat-grid-app" id="cat-grid-app"></div>
-
-        <div class="field-label">รายการ</div>
-        <input id="f-name" type="text" placeholder="เช่น ซัมกยอปซัล · ช้อปปิ้ง Myeongdong...">
-
-        <div class="field-label">จำนวนเงิน</div>
-        <div class="amount-row">
-          <input id="f-amount" type="number" placeholder="0" min="0" inputmode="decimal">
-          <select id="f-cur2"></select>
-        </div>
-
-        <div class="field-label">ผู้จ่าย</div>
-        <div class="payer-row" id="payer-row"></div>
-
-        <div class="field-label">วิธีชำระ</div>
-        <div class="pay-row" id="pay-row">
-          <div class="pay-btn on" data-pay="cash">💵 เงินสด</div>
-          <div class="pay-btn" data-pay="card">💳 บัตรเครดิต</div>
-          <div class="pay-btn" data-pay="travel">🪙 Travel Card</div>
-        </div>
-
-        <div class="field-label">หมายเหตุ (ไม่บังคับ)</div>
-        <input id="f-note" type="text" placeholder="รายละเอียดเพิ่มเติม...">
-
-        <button class="btn btn-primary" id="btn-add" style="margin-top:18px;">✅ บันทึก</button>
-      </div>
+  <nav class="nav">
+    <div class="nav-in">
+      <button class="nav-b on" data-act="view" data-view="home"><span>🏠</span>ภาพรวม</button>
+      <button class="nav-b" data-act="view" data-view="list"><span>📋</span>รายการ</button>
+      <button class="fab" data-act="add-exp" aria-label="เพิ่มรายการ">+</button>
+      <button class="nav-b" data-act="view" data-view="settle"><span>🔁</span>สรุปโอน</button>
+      <button class="nav-b" data-act="view" data-view="trip"><span>⚙️</span>ทริป</button>
     </div>
-
-    <!-- LIST -->
-    <div class="tab-pane" id="tab-list">
-      <div class="day-scroll" id="day-scroll"></div>
-      <div class="list-header">
-        <div class="list-title">รายการ</div>
-        <div class="list-count" id="list-count">0 รายการ</div>
-      </div>
-      <div id="expense-list"></div>
-    </div>
-
-    <!-- SUMMARY -->
-    <div class="tab-pane" id="tab-summary">
-
-      <div class="sum-section-title">💱 อัตราแลกเปลี่ยน</div>
-      <div id="rates-wrap"></div>
-
-      <div class="sum-section-title">🍩 ภาพรวมทั้งทริป</div>
-      <div class="chart-wrap">
-        <div class="chart-inner">
-          <div class="chart-canvas-wrap"><canvas id="donut-chart"></canvas></div>
-          <div class="chart-legend" id="chart-legend"></div>
-        </div>
-      </div>
-
-      <div class="sum-section-title">สรุปแยกหมวดหมู่</div>
-      <div id="cat-accordion"></div>
-
-      <div class="sum-section-title">👤 สรุปตามผู้จ่าย</div>
-      <div id="payer-sum"></div>
-
-      <div class="sum-section-title">📅 แบ่งตามวัน</div>
-      <div id="day-bars"></div>
-
-    </div>
-  </div>
+  </nav>
 </div>
 
-<!-- CODE MODAL -->
-<div class="modal-bg" id="code-modal">
-  <div class="modal-box">
-    <div style="font-size:32px;margin-bottom:8px">🔑</div>
-    <div style="font-size:20px;font-weight:700;margin-bottom:4px">Trip Code</div>
-    <div class="modal-hint">แชร์ให้เพื่อนในทริปเพื่อเข้าร่วม</div>
-    <div class="modal-code" id="modal-code-txt">——</div>
-    <div id="modal-link-box" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:20px;color:var(--muted);word-break:break-all;margin-bottom:14px;text-align:left"></div>
-    <div class="modal-hint">กดปุ่มด้านล่างเพื่อคัดลอก link แชร์ใน LINE ได้เลย</div>
-    <button class="modal-btn" id="modal-share" style="background:var(--accent);color:var(--accent-dark);font-weight:700;border-color:var(--accent)">🔗 คัดลอก Link แชร์</button>
-    <button class="modal-btn" id="modal-copy">📋 คัดลอก Code</button>
-    <button class="modal-btn" id="modal-close">ปิด</button>
+<!-- ══════════ SHEETS ══════════ -->
+<div class="ov" id="ov" data-act="close-sheet"></div>
+
+<div class="sheet" id="sh-exp" role="dialog" aria-label="รายการค่าใช้จ่าย">
+  <div class="grab"></div>
+  <div class="sheet-t"><h3 id="ex-title">เพิ่มรายการ</h3><button class="x" data-act="close-sheet" aria-label="ปิด">✕</button></div>
+  <div class="amt-in"><span class="sym" id="ex-sym">¥</span><input id="ex-amt" type="number" inputmode="decimal" placeholder="0"></div>
+  <div class="amt-cur" id="ex-curs"></div>
+  <div class="amt-conv num" id="ex-conv"></div>
+
+  <input class="f-in" id="ex-name" placeholder="ชื่อรายการ" maxlength="60">
+
+  <div class="f-l">หมวดหมู่</div>
+  <div class="chips" id="ex-cats"></div>
+
+  <div class="f-l">ใครจ่าย</div>
+  <div class="chips" id="ex-payer"></div>
+  <div class="hint" id="ex-payer-hint"></div>
+
+  <div class="f-l">หารกับใคร</div>
+  <div class="seg" id="ex-split">
+    <button data-act="ex-split" data-s="all" class="on">ทุกคน</button>
+    <button data-act="ex-split" data-s="pick">เลือกคน</button>
   </div>
+  <div class="chips" id="ex-pick" style="margin-top:8px"></div>
+  <div class="hint" id="ex-split-hint"></div>
+
+  <div class="pool-warn" id="ex-pool-warn">
+    <div id="ex-pool-warn-t"></div>
+    <div class="grid2">
+      <button class="btn btn-ghost" data-act="warn-topup">+ เติมกองก่อน</button>
+      <button class="btn btn-ghost" data-act="warn-member">ให้คนสำรองจ่าย</button>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div><div class="f-l">วัน</div><select class="f-in" id="ex-day"></select></div>
+    <div><div class="f-l">จ่ายด้วย</div><select class="f-in" id="ex-pay">
+      <option value="cash">💵 เงินสด</option><option value="card">💳 บัตร</option><option value="travel">🪙 Travel card</option>
+    </select></div>
+  </div>
+  <div class="f-l">หมายเหตุ (ไม่บังคับ)</div>
+  <input class="f-in" id="ex-note" maxlength="100" placeholder="รายละเอียดเพิ่มเติม">
+
+  <button class="btn btn-lime" style="margin-top:20px" data-act="save-exp" id="ex-save">บันทึก</button>
+  <button class="btn btn-danger" style="margin-top:8px;display:none" data-act="del-exp" id="ex-del">🗑 ลบรายการนี้</button>
 </div>
 
-<div id="toast-wrap"></div>
+<div class="sheet" id="sh-top" role="dialog" aria-label="เติมกองกลาง">
+  <div class="grab"></div>
+  <div class="sheet-t"><h3>💰 เติมกองกลาง</h3><button class="x" data-act="close-sheet" aria-label="ปิด">✕</button></div>
+  <div class="seg" id="tp-mode" style="margin:6px 0 10px">
+    <button data-act="tp-mode" data-m="all" class="on">ทุกคนเท่ากัน</button>
+    <button data-act="tp-mode" data-m="one">รายคน</button>
+  </div>
+  <div class="amt-in"><span class="sym" id="tp-sym">¥</span><input id="tp-amt" type="number" inputmode="decimal" placeholder="0"></div>
+  <div class="amt-conv num" id="tp-conv"></div>
+  <div id="tp-one" style="display:none">
+    <div class="f-l">ใครเติม</div>
+    <div class="chips" id="tp-mem"></div>
+  </div>
+  <button class="btn btn-lime" style="margin-top:20px" data-act="save-top">เติมเงิน</button>
+</div>
+
+<div class="toast" id="toast"><span id="toast-t"></span><button id="toast-b" style="display:none"></button></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-// ══════════════════════════════════════
-// CONSTANTS
-// ══════════════════════════════════════
-var AVATAR_COLORS = ['#58a6ff','#3fb950','#f0a500','#f472b6','#bc8cff','#39d3f2','#f85149'];
-var DEFAULT_RATES = {THB:1,KRW:0.026,JPY:0.24,USD:36,EUR:39,GBP:46,CNY:5,SGD:27};
-var DEFAULT_CATS  = ['food','shopping','souvenir','transport','accommodation','activity','other'];
+'use strict';
 
-var ALL_CATS = {
-  food:          {emoji:'🍜',label:'Food & Drink',     color:'#3fb950'},
-  shopping:      {emoji:'🛍',label:'Shopping',         color:'#bc8cff'},
-  souvenir:      {emoji:'🎁',label:'Souvenir',         color:'#f472b6'},
-  transport:     {emoji:'🚌',label:'Transport',        color:'#58a6ff'},
-  accommodation: {emoji:'🏨',label:'Accommodation',    color:'#f0a500'},
-  activity:      {emoji:'🎡',label:'Activity',         color:'#39d3f2'},
-  other:         {emoji:'📦',label:'Other',            color:'#7d8590'},
-  aesthetic:     {emoji:'💉',label:'Aesthetic Clinic', color:'#f472b6'},
-  snack:         {emoji:'🍿',label:'Snack & Street',   color:'#f0a500'},
-  entertainment: {emoji:'🎰',label:'Entertainment',    color:'#bc8cff'},
-  outdoor:       {emoji:'⛷️',label:'Outdoor',          color:'#3fb950'},
-  photobooth:    {emoji:'📸',label:'Photo Booth',      color:'#39d3f2'},
-  health:        {emoji:'💊',label:'Health',           color:'#f85149'},
+// ══════════ CONSTANTS ══════════
+var AV_COLORS=['#39d3f2','#f472b6','#f0a500','#3fb950','#bc8cff','#58a6ff','#ff8a65','#c0f000','#e879f9','#2dd4bf'];
+var DEFAULT_RATES={THB:1,KRW:0.025,JPY:0.22,USD:34,EUR:38,GBP:44,CNY:4.8,SGD:26,TWD:1.05,HKD:4.4,VND:0.0013};
+var CUR_LIST=['THB','JPY','KRW','USD','EUR','GBP','CNY','SGD','TWD','HKD','VND'];
+var FLAG={THB:'🇹🇭',JPY:'🇯🇵',KRW:'🇰🇷',USD:'🇺🇸',EUR:'🇪🇺',GBP:'🇬🇧',CNY:'🇨🇳',SGD:'🇸🇬',TWD:'🇹🇼',HKD:'🇭🇰',VND:'🇻🇳'};
+var SYM={THB:'฿',USD:'$',EUR:'€',GBP:'£',JPY:'¥',KRW:'₩',CNY:'¥',SGD:'S$',TWD:'NT$',HKD:'HK$',VND:'₫'};
+var PLACEHOLDER={JPY:'เช่น ราเมง Ichiran',KRW:'เช่น ซัมกยอปซัล',CNY:'เช่น หม้อไฟ',TWD:'เช่น ชานมไข่มุก',VND:'เช่น เฝอ',USD:'เช่น Uber ไปโรงแรม',EUR:'เช่น ตั๋วพิพิธภัณฑ์',GBP:'เช่น Afternoon tea',SGD:'เช่น ข้าวมันไก่',HKD:'เช่น ติ่มซำ',THB:'เช่น ข้าวเย็น'};
+var DEFAULT_CATS=['food','shopping','souvenir','transport','accommodation','activity','other'];
+var EXTRA_CATS=['snack','entertainment','outdoor','photobooth','aesthetic','health'];
+var ALL_CATS={
+  food:{e:'🍜',l:'อาหาร',c:'#3fb950'},
+  shopping:{e:'🛍️',l:'ช้อปปิ้ง',c:'#bc8cff'},
+  souvenir:{e:'🎁',l:'ของฝาก',c:'#f472b6'},
+  transport:{e:'🚄',l:'เดินทาง',c:'#58a6ff'},
+  accommodation:{e:'🏨',l:'ที่พัก',c:'#f0a500'},
+  activity:{e:'🎡',l:'กิจกรรม',c:'#39d3f2'},
+  other:{e:'📦',l:'อื่นๆ',c:'#8b92ad'},
+  snack:{e:'🍡',l:'ของกินเล่น',c:'#ff8a65'},
+  entertainment:{e:'🎤',l:'บันเทิง',c:'#e879f9'},
+  outdoor:{e:'⛷️',l:'เอาท์ดอร์',c:'#2dd4bf'},
+  photobooth:{e:'📸',l:'ถ่ายรูป',c:'#fbbf24'},
+  aesthetic:{e:'💆',l:'คลินิก/สปา',c:'#f9a8d4'},
+  health:{e:'💊',l:'สุขภาพ',c:'#ff7070'}
 };
+function catOf(k){return ALL_CATS[k]||{e:'📦',l:k||'อื่นๆ',c:'#8b92ad'}}
 
-// ══════════════════════════════════════
-// STATE
-// ══════════════════════════════════════
-var trip       = null;
-var expenses   = [];
-var customRates= {};
-var selCat     = '';
-var selPayer   = '';
-var selPay     = 'cash';
-var filterDay  = 'all';
-var showBase   = false;   // false = trip currency, true = base (THB)
-var setupStep  = 0;
-var setupData  = {travelers:[],currencies:['THB'],extraCats:[],base:'THB'};
-var donutChart = null;
+// ══════════ FIREBASE ══════════
+firebase.initializeApp({
+  apiKey:"AIzaSyCEf_D8eQxBsB_URqHe1nc8GWIO6kf_KMQ",
+  authDomain:"jodyub-842bd.firebaseapp.com",
+  databaseURL:"https://jodyub-842bd-default-rtdb.firebaseio.com",
+  projectId:"jodyub-842bd",
+  storageBucket:"jodyub-842bd.firebasestorage.app",
+  messagingSenderId:"389947844606",
+  appId:"1:389947844606:web:5c7cca4e97bb4120bb82af"
+});
+var db=firebase.database();
 
-// ══════════════════════════════════════
-// FIREBASE INIT
-// ══════════════════════════════════════
-var firebaseConfig = {
-  apiKey: "AIzaSyCEf_D8eQxBsB_URqHe1nc8GWIO6kf_KMQ",
-  authDomain: "jodyub-842bd.firebaseapp.com",
-  databaseURL: "https://jodyub-842bd-default-rtdb.firebaseio.com",
-  projectId: "jodyub-842bd",
-  storageBucket: "jodyub-842bd.firebasestorage.app",
-  messagingSenderId: "389947844606",
-  appId: "1:389947844606:web:5c7cca4e97bb4120bb82af"
-};
-firebase.initializeApp(firebaseConfig);
-var db = firebase.database();
+// ══════════ STATE ══════════
+var trip=null, expenses=[], contributions=[], customRates={};
+var view='home', filterDay='all', showBase=false, tripRef=null;
+var setup, ex, tp;
 
-// ══════════════════════════════════════
-// COUNTER (Firebase real counter)
-// ══════════════════════════════════════
-function initCounter(){
-  db.ref('counter').on('value', function(snap){
-    var n = snap.val() || 24;
-    var el = document.getElementById('trip-counter');
-    if(el) el.textContent = n.toLocaleString() + ' ทริป';
+// ══════════ UTILS ══════════
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmt(n,cur){
+  var digits=(cur==='USD'||cur==='EUR'||cur==='GBP'||cur==='SGD')&&Math.abs(n)<100?2:0;
+  return (SYM[cur]||cur+' ')+(Math.round((n||0)*100)/100).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:digits});
+}
+function genCode(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
+function pad(n){return n<10?'0'+n:''+n}
+function isoDate(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+var toastTimer;
+function toast(msg,action){
+  var t=$('toast'),b=$('toast-b');
+  $('toast-t').textContent=msg;
+  if(action){b.textContent=action.label;b.style.display='';b.onclick=function(){action.fn();t.classList.remove('show')}}
+  else{b.style.display='none';b.onclick=null}
+  t.classList.add('show');clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.classList.remove('show')},action?5000:2400);
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  $(id).classList.add('active');window.scrollTo(0,0);
+}
+function copyText(txt,okMsg){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){toast(okMsg)},function(){fallbackCopy(txt,okMsg)});
+  } else fallbackCopy(txt,okMsg);
+}
+function fallbackCopy(txt,okMsg){
+  var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast(okMsg)}catch(e){toast('คัดลอกไม่ได้ ลองใหม่อีกครั้ง')}
+  document.body.removeChild(ta);
+}
+
+// ══════════ DATA LAYER ══════════
+function tripPath(p){return 'trips/'+trip.code+(p?'/'+p:'')}
+function saveExpense(e){var d=Object.assign({},e);delete d._key;return db.ref(tripPath('expenses/'+(e._key||e.id))).set(d)}
+function deleteExpense(e){return db.ref(tripPath('expenses/'+(e._key||e.id))).remove()}
+function addContribution(member,amount,currency,day){
+  var ref=db.ref(tripPath('contributions')).push();
+  return ref.set({id:ref.key,member:member,amount:amount,currency:currency,day:day||'',ts:Date.now()});
+}
+function addContributionAll(amount,currency,day){
+  return Promise.all(trip.travelers.map(function(n){return addContribution(n,amount,currency,day)}));
+}
+function saveContribution(c){var d=Object.assign({},c);delete d._key;return db.ref(tripPath('contributions/'+(c._key||c.id))).set(d)}
+function deleteContribution(c){return db.ref(tripPath('contributions/'+(c._key||c.id))).remove()}
+function normList(v){
+  if(!v)return[];
+  var out=[];
+  Object.keys(v).forEach(function(k){var o=v[k];if(o&&typeof o==='object'){o._key=k;out.push(o)}});
+  return out;
+}
+function arr(v){if(!v)return[];return Array.isArray(v)?v.filter(function(x){return x!=null}):Object.keys(v).map(function(k){return v[k]})}
+
+// ══════════ RATES ══════════
+function getRate(cur){
+  if(!trip||cur===trip.baseCurrency)return 1;
+  return customRates[cur]!==undefined?+customRates[cur]:(DEFAULT_RATES[cur]||1)/(trip.baseCurrency==='USD'?DEFAULT_RATES.USD:1);
+}
+function toBase(amount,cur){return (+amount||0)*getRate(cur)}
+function fromBase(v,cur){return v/getRate(cur)}
+function baseOf(e){return toBase(e.amount,e.currency)}
+function foreignCurs(){return arr(trip.currencies).filter(function(c){return c!==trip.baseCurrency})}
+function mainCur(){return trip.mainCurrency||foreignCurs()[0]||trip.baseCurrency}
+function dispCur(){return showBase?trip.baseCurrency:mainCur()}
+function money(vBase){return fmt(fromBase(vBase,dispCur()),dispCur())}
+function moneySub(vBase){
+  var d=dispCur();
+  if(d!==trip.baseCurrency)return '≈ '+fmt(vBase,trip.baseCurrency);
+  if(mainCur()!==trip.baseCurrency)return '≈ '+fmt(fromBase(vBase,mainCur()),mainCur());
+  return '';
+}
+// เรทล่าสุด (ฟรี ไม่ต้องใช้ key) → {JPY:0.22,...} หน่วย = base ต่อ 1 สกุลนั้น
+function fetchLiveRates(base){
+  return fetch('https://open.er-api.com/v6/latest/'+base).then(function(r){return r.json()}).then(function(d){
+    if(!d||!d.rates)throw new Error('no rates');
+    var out={};
+    Object.keys(d.rates).forEach(function(c){if(d.rates[c])out[c]=+(1/d.rates[c]).toPrecision(4)});
+    return out;
   });
 }
-function incCounter(){
-  db.ref('counter').transaction(function(n){ return (n||24)+1; });
-}
-initCounter();
 
-// ══════════════════════════════════════
-// DB (Firebase)
-// ══════════════════════════════════════
-function saveTrip(){
-  db.ref('trips/'+trip.code).set(trip);
+// ══════════ ENGINE (ทดสอบแล้ว) ══════════
+function splitOf(e,travelers){
+  var w=e.splitWith;
+  if(w&&!Array.isArray(w))w=Object.keys(w).map(function(k){return w[k]});
+  return (w&&w.length)?w:travelers.slice();
 }
-function saveExpenses(){
-  db.ref('trips/'+trip.code+'/expenses').set(expenses);
-}
-function saveRates(){
-  db.ref('trips/'+trip.code+'/rates').set(customRates);
-}
-
-// ══════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════
-function genCode(){
-  var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';
-  for(var i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];
-  return s;
-}
-function fmt(n,cur){
-  var sym={THB:'฿',USD:'$',EUR:'€',GBP:'£',JPY:'¥',KRW:'₩',CNY:'¥',SGD:'S$'};
-  return (sym[cur]||cur+' ')+(n||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-}
-function getRate(cur){
-  if(cur===trip.baseCurrency)return 1;
-  return customRates[cur]!==undefined?customRates[cur]:(DEFAULT_RATES[cur]||1);
-}
-function toBase(amount,cur){return amount*getRate(cur)}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function buildDays(){
-  var days=[];
-  if(trip.dateStart&&trip.dateEnd){
-    var s=new Date(trip.dateStart),e=new Date(trip.dateEnd),c=new Date(s),i=1;
-    while(c<=e){
-      days.push({key:'day'+i,label:'Day '+i+' · '+c.toLocaleDateString('th-TH',{day:'numeric',month:'short'})});
-      c.setDate(c.getDate()+1);i++;
-    }
+function isPersonalOnly(payer,splitWith){return payer!=='pool'&&splitWith.length===1&&splitWith[0]===payer}
+function calcBalances(travelers,exps,contribs,conv){
+  var people=travelers.slice();
+  var r={people:people,contrib:{},paid:{},share:{},poolShare:{},poolNet:{},debtNet:{},net:{},contribTotal:0,poolSpent:0,total:0};
+  function ensure(n){
+    if(r.contrib[n]===undefined){r.contrib[n]=0;r.paid[n]=0;r.share[n]=0;r.poolShare[n]=0;if(people.indexOf(n)<0)people.push(n)}
   }
-  if(!days.length)for(var j=1;j<=7;j++)days.push({key:'day'+j,label:'Day '+j});
+  people.forEach(ensure);
+  (contribs||[]).forEach(function(c){var v=conv(+c.amount||0,c.currency);ensure(c.member);r.contrib[c.member]+=v;r.contribTotal+=v});
+  (exps||[]).forEach(function(e){
+    var v=conv(+e.amount||0,e.currency),w=splitOf(e,travelers),each=v/w.length;
+    r.total+=v;
+    if(e.payer==='pool'){r.poolSpent+=v;w.forEach(function(n){ensure(n);r.poolShare[n]+=each})}
+    else{ensure(e.payer);r.paid[e.payer]+=v;w.forEach(function(n){ensure(n);r.share[n]+=each})}
+  });
+  people.forEach(function(n){
+    r.poolNet[n]=r.contrib[n]-r.poolShare[n];
+    r.debtNet[n]=r.paid[n]-r.share[n];
+    r.net[n]=r.poolNet[n]+r.debtNet[n];
+  });
+  r.poolLeft=r.contribTotal-r.poolSpent;
+  return r;
+}
+function settle(net){
+  var cr=[],dr=[],out=[],EPS=0.5;
+  Object.keys(net).forEach(function(n){if(net[n]>EPS)cr.push({n:n,v:net[n]});else if(net[n]<-EPS)dr.push({n:n,v:-net[n]})});
+  cr.sort(function(a,b){return b.v-a.v});dr.sort(function(a,b){return b.v-a.v});
+  var i=0,j=0;
+  while(i<dr.length&&j<cr.length){
+    var x=Math.min(dr[i].v,cr[j].v);
+    out.push({from:dr[i].n,to:cr[j].n,amount:x});
+    dr[i].v-=x;cr[j].v-=x;
+    if(dr[i].v<=EPS)i++;if(cr[j].v<=EPS)j++;
+  }
+  return out;
+}
+function bal(){return calcBalances(arr(trip.travelers),expenses,contributions,toBase)}
+function usePool(){return trip.mode==='pool'||contributions.length>0||expenses.some(function(e){return e.payer==='pool'})}
+
+// ══════════ DAYS ══════════
+function parseD(s){var p=(s||'').split('-');return p.length===3?new Date(+p[0],+p[1]-1,+p[2]):null}
+function buildDays(){
+  var days=[],s=parseD(trip.dateStart),e=parseD(trip.dateEnd);
+  if(s&&e&&e>=s){
+    var c=new Date(s),i=1;
+    while(c<=e&&i<=60){days.push({key:'day'+i,n:i,short:c.toLocaleDateString('th-TH',{day:'numeric',month:'short'})});c.setDate(c.getDate()+1);i++}
+  }
+  if(!days.length)for(var j=1;j<=7;j++)days.push({key:'day'+j,n:j,short:''});
+  // วันที่มีรายการแต่อยู่นอกช่วง (เช่นแก้วันที่ทริปทีหลัง)
+  expenses.forEach(function(x){
+    var n=parseInt((x.day||'').replace('day',''),10);
+    if(n&&!days.some(function(d){return d.n===n}))days.push({key:'day'+n,n:n,short:''});
+  });
+  days.sort(function(a,b){return a.n-b.n});
   return days;
 }
-function tripCurs(){return(trip.currencies||[]).filter(function(c){return c!==trip.baseCurrency})}
-
-// ══════════════════════════════════════
-// SCREEN SWITCH
-// ══════════════════════════════════════
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
-  document.getElementById(id).classList.add('active');
+function dayLabel(key){
+  var d=buildDays().filter(function(x){return x.key===key})[0];
+  var n=(key||'').replace('day','');
+  return 'Day '+n+(d&&d.short?' · '+d.short:'');
+}
+// index วันนี้ของทริป (อาจ <1 หรือ >จำนวนวัน)
+function todayIdx(){
+  var s=parseD(trip.dateStart);if(!s)return null;
+  var t=new Date();t.setHours(0,0,0,0);
+  return Math.round((t-s)/864e5)+1;
+}
+function todayKey(){
+  var days=buildDays(),i=todayIdx();
+  if(i==null)return days[0].key;
+  i=Math.max(1,Math.min(i,days[days.length-1].n));
+  return 'day'+i;
 }
 
-// ══════════════════════════════════════
-// SHAREABLE LINK — check URL on load
-// ══════════════════════════════════════
-function checkURLTrip(){
-  var params = new URLSearchParams(window.location.search);
-  var code = params.get('trip');
-  if(!code) return;
-  code = code.toUpperCase();
-  toast('⏳ กำลังโหลดทริป '+code+'...');
+// ══════════ AVATARS ══════════
+function memColor(n){var i=arr(trip&&trip.travelers).indexOf(n);return i<0?'#8b92ad':AV_COLORS[i%AV_COLORS.length]}
+function initial(n){
+  var s=String(n||'?').trim();
+  // ชื่อไทยที่ขึ้นต้นด้วยสระหน้า (เ แ โ ใ ไ) → เอาพยัญชนะตัวถัดไปด้วย เช่น เอม → เอ
+  var c=/^[เแโใไ]/.test(s)?s.slice(0,2):s[0];
+  return esc((c||'?').toUpperCase());
+}
+// ช่องกรอกเงินกว้างตามตัวเลข → สัญลักษณ์อยู่ชิดตัวเลข
+function fitAmt(el){el.style.width=Math.max(1,(el.value||el.placeholder||'0').length)+0.6+'ch'}
+function av(n,cls){
+  if(n==='pool')return '<span class="av '+(cls||'')+'" style="background:rgba(192,240,0,.15)">💰</span>';
+  var c=memColor(n);
+  return '<span class="av '+(cls||'')+'" style="background:'+c+'26;color:'+c+'">'+initial(n)+'</span>';
+}
+function payerLabel(p){return p==='pool'?'กองกลาง':esc(p)}
+
+// ══════════ COUNTER ══════════
+db.ref('counter').on('value',function(snap){var n=snap.val();$('trip-counter').textContent=n?n.toLocaleString():'—'});
+function incCounter(){db.ref('counter').transaction(function(n){return (n||0)+1})}
+
+// ══════════ RECENT TRIPS ══════════
+function getRecent(){try{return JSON.parse(localStorage.getItem('jodyub_recent')||'[]')}catch(e){return[]}}
+function setRecent(list){try{localStorage.setItem('jodyub_recent',JSON.stringify(list))}catch(e){}}
+function saveRecent(){
+  var list=getRecent().filter(function(r){return r.code!==trip.code});
+  list.unshift({code:trip.code,name:trip.name,dest:trip.destination||''});
+  setRecent(list.slice(0,8));renderRecent();
+}
+function renderRecent(){
+  var list=getRecent();
+  $('recent-card').style.display=list.length?'':'none';
+  $('recent-list').innerHTML=list.map(function(r){
+    return '<div class="recent" data-act="open-recent" data-code="'+esc(r.code)+'">'+
+      '<div class="recent-b"><div>'+esc(r.name)+'</div><small>'+esc(r.dest)+'</small></div>'+
+      '<span class="recent-code">'+esc(r.code)+'</span>'+
+      '<button class="x" data-act="rm-recent" data-code="'+esc(r.code)+'" aria-label="เอาออกจากรายการ">✕</button></div>';
+  }).join('');
+}
+
+// ══════════ OPEN TRIP ══════════
+function openTrip(code,btn){
+  code=String(code||'').trim().toUpperCase();
+  if(!/^[A-Z0-9]{6}$/.test(code)){toast('⚠️ โค้ดทริปต้องมี 6 ตัว');return}
+  if(btn){btn.disabled=true;btn.textContent='⏳ กำลังโหลด...'}
   db.ref('trips/'+code).once('value').then(function(snap){
-    if(!snap.exists()){toast('❌ ไม่พบทริป: '+code);return}
-    trip=snap.val();expenses=trip.expenses||[];customRates=trip.rates||{};
-    saveRecentTrip(code);
-    showScreen('s-app');initApp();listenTrip(code);
-    // clear URL param หลังโหลดสำเร็จ
-    window.history.replaceState({},'',window.location.pathname);
+    if(btn){btn.disabled=false;btn.textContent='เข้าร่วม →'}
+    if(!snap.exists()){toast('❌ ไม่พบทริป '+code);return}
+    applyTrip(snap.val());
+    saveRecent();enterApp();listen();
   }).catch(function(){
-    toast('❌ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+    if(btn){btn.disabled=false;btn.textContent='เข้าร่วม →'}
+    toast('❌ เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง');
   });
 }
-
-function getShareLink(code){
-  return window.location.origin + window.location.pathname + '?trip=' + code;
+function applyTrip(data){
+  trip=data;
+  trip.travelers=arr(trip.travelers);
+  trip.currencies=arr(trip.currencies);
+  trip.categories=arr(trip.categories);
+  if(!trip.currencies.length)trip.currencies=[trip.baseCurrency||'THB'];
+  if(!trip.baseCurrency)trip.baseCurrency='THB';
+  expenses=normList(data.expenses);
+  contributions=normList(data.contributions);
+  customRates=data.rates||{};
 }
-
-// ══════════════════════════════════════
-// LANDING
-// ══════════════════════════════════════
-document.getElementById('btn-new-trip').addEventListener('click',function(){
-  setupStep=0;
-  setupData={travelers:[],currencies:['THB'],extraCats:[],base:'THB'};
-  renderSetupDots();renderTravelerList();
-  showScreen('s-setup');
-});
-
-document.getElementById('btn-join').addEventListener('click',function(){
-  var code=document.getElementById('join-input').value.trim().toUpperCase();
-  if(!code){toast('⚠️ กรุณากรอก Trip Code');return}
-  var btn=document.getElementById('btn-join');
-  btn.textContent='⏳ กำลังโหลด...';btn.disabled=true;
-  db.ref('trips/'+code).once('value').then(function(snap){
-    btn.textContent='🚀 เข้าร่วม';btn.disabled=false;
-    if(!snap.exists()){toast('❌ ไม่พบทริป: '+code);return}
-    trip=snap.val();
-    expenses=trip.expenses||[];
-    customRates=trip.rates||{};
-    // save to recent trips
-    saveRecentTrip(code);
-    showScreen('s-app');initApp();
-    // listen realtime
-    listenTrip(code);
-  }).catch(function(){
-    btn.textContent='🚀 เข้าร่วม';btn.disabled=false;
-    toast('❌ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+function enterApp(){
+  view='home';filterDay='all';showBase=false;
+  show('s-app');renderAll();
+}
+function listen(){
+  if(tripRef)tripRef.off();
+  tripRef=db.ref('trips/'+trip.code);
+  tripRef.on('value',function(snap){
+    if(!snap.exists())return;
+    applyTrip(snap.val());renderAll();
+    if($('sh-exp').classList.contains('open'))exRefreshWarn();
   });
+}
+var everConnected=false;
+db.ref('.info/connected').on('value',function(s){
+  var on=!!s.val();if(on)everConnected=true;
+  $('live').className='live '+(on?'on':everConnected?'off':'');
+  $('live-t').textContent=on?'Live':everConnected?'ออฟไลน์':'เชื่อมต่อ…';
 });
+function leaveTrip(){if(tripRef)tripRef.off();tripRef=null;trip=null;show('s-landing');renderRecent()}
 
-document.getElementById('join-input').addEventListener('input',function(){
-  this.value=this.value.toUpperCase();
-});
-
-// ══════════════════════════════════════
-// SETUP
-// ══════════════════════════════════════
-function renderSetupDots(){
-  var d=document.getElementById('step-dots');d.innerHTML='';
-  for(var i=0;i<4;i++){
-    var dot=document.createElement('div');
-    dot.className='sdot-step'+(i===setupStep?' active':i<setupStep?' done':'');
-    d.appendChild(dot);
-  }
+// ══════════ SETUP ══════════
+var STEP_TITLES=['ข้อมูลทริป','ใครไปบ้าง','สกุลเงิน','วิธีจ่าย','หมวดหมู่'];
+function startSetup(){
+  setup={step:0,members:[],currencies:['THB'],base:'THB',rates:{},live:null,mode:'split',extra:[]};
+  ['s-name','s-dest','s-start','s-end','s-mem-in','s-pool-amt'].forEach(function(id){$(id).value=''});
+  $('s-base').value='THB';
+  goStep(0);show('s-setup');
+  fetchLiveRates('THB').then(function(r){setup.live=r;if(setup.step===2)renderSetupRates()}).catch(function(){});
 }
 function goStep(n){
-  document.getElementById('sp-'+setupStep).classList.remove('active');
-  setupStep=n;
-  document.getElementById('sp-'+setupStep).classList.add('active');
-  renderSetupDots();
+  setup.step=n;
+  document.querySelectorAll('.step').forEach(function(s){s.classList.toggle('on',+s.dataset.step===n)});
+  $('dots').innerHTML=STEP_TITLES.map(function(_,i){return '<i class="'+(i===n?'on':i<n?'past':'')+'"></i>'}).join('');
+  $('setup-sub').textContent='ขั้นที่ '+(n+1)+'/5 · '+STEP_TITLES[n];
+  if(n===1)renderSetupMembers();
+  if(n===2){renderSetupCurs();renderSetupRates()}
+  if(n===3)renderSetupMode();
+  if(n===4)renderSetupCats();
+  window.scrollTo(0,0);
 }
-
-document.getElementById('setup-back').addEventListener('click',function(){showScreen('s-landing')});
-document.getElementById('sp0-next').addEventListener('click',function(){
-  if(!document.getElementById('s-name').value.trim()){toast('⚠️ กรุณากรอกชื่อทริป');return}
-  goStep(1);
-});
-document.getElementById('sp1-prev').addEventListener('click',function(){goStep(0)});
-document.getElementById('sp1-next').addEventListener('click',function(){
-  if(!setupData.travelers.length){toast('⚠️ เพิ่มผู้เดินทางอย่างน้อย 1 คน');return}
-  goStep(2);
-});
-document.getElementById('sp2-prev').addEventListener('click',function(){goStep(1)});
-document.getElementById('sp2-next').addEventListener('click',function(){goStep(3)});
-document.getElementById('sp3-prev').addEventListener('click',function(){goStep(2)});
-
-// Traveler
-document.getElementById('traveler-add').addEventListener('click',addTraveler);
-document.getElementById('traveler-inp').addEventListener('keydown',function(e){if(e.key==='Enter')addTraveler()});
-function addTraveler(){
-  var inp=document.getElementById('traveler-inp'),name=inp.value.trim();
-  if(!name)return;
-  setupData.travelers.push(name);inp.value='';renderTravelerList();
+function stepValid(){
+  var n=setup.step;
+  if(n===0){
+    if(!$('s-name').value.trim()){toast('⚠️ ตั้งชื่อทริปก่อนนะ');$('s-name').focus();return false}
+    var s=$('s-start').value,e=$('s-end').value;
+    if(s&&e&&e<s){toast('⚠️ วันสุดท้ายต้องไม่ก่อนวันเริ่ม');return false}
+  }
+  if(n===1){
+    addSetupMember();
+    if(setup.members.length<2){toast('⚠️ เพิ่มอย่างน้อย 2 คน');return false}
+  }
+  if(n===2){
+    var bad=setupForeign().filter(function(c){var v=+setup.rates[c];return !(v>0)});
+    if(bad.length){toast('⚠️ ใส่เรท '+bad[0]+' ด้วย');return false}
+  }
+  return true;
 }
-function renderTravelerList(){
-  var el=document.getElementById('traveler-list');
-  if(!setupData.travelers.length){el.innerHTML='<div style="color:var(--muted);font-size:20px;padding:4px 0">ยังไม่มีผู้เดินทาง</div>';return}
-  el.innerHTML=setupData.travelers.map(function(n,i){
-    var c=AVATAR_COLORS[i%AVATAR_COLORS.length];
-    return '<div class="traveler-row"><div class="t-avatar" style="background:'+c+'20;color:'+c+'">'+n[0].toUpperCase()+'</div>'+
-      '<div class="t-name">'+esc(n)+'</div>'+
-      '<button class="t-del" data-i="'+i+'">✕</button></div>';
+function addSetupMember(){
+  var inp=$('s-mem-in'),n=inp.value.trim();
+  if(!n)return;
+  if(setup.members.some(function(m){return m.toLowerCase()===n.toLowerCase()})){toast('⚠️ มีชื่อนี้แล้ว');return}
+  if(n==='pool'){toast('⚠️ ใช้ชื่อนี้ไม่ได้');return}
+  setup.members.push(n);inp.value='';renderSetupMembers();
+}
+function renderSetupMembers(){
+  $('s-members').innerHTML=setup.members.map(function(n,i){
+    var c=AV_COLORS[i%AV_COLORS.length];
+    return '<div class="mem-row"><span class="av" style="background:'+c+'26;color:'+c+'">'+initial(n)+'</span><span class="n">'+esc(n)+'</span>'+
+      '<button class="x" data-act="s-rm-mem" data-i="'+i+'" aria-label="ลบ">✕</button></div>';
+  }).join('')||'<div class="hint" style="margin:0 0 10px">ยังไม่มีใคร เพิ่มชื่อตัวเองก่อนก็ได้</div>';
+}
+function setupForeign(){return setup.currencies.filter(function(c){return c!==setup.base})}
+function renderSetupCurs(){
+  $('s-curs').innerHTML=CUR_LIST.map(function(c){
+    var on=setup.currencies.indexOf(c)>=0;
+    return '<button class="ch'+(on?' on':'')+'" data-act="s-cur" data-cur="'+c+'">'+FLAG[c]+' '+c+'</button>';
   }).join('');
-  el.querySelectorAll('.t-del').forEach(function(b){
-    b.addEventListener('click',function(){setupData.travelers.splice(+this.dataset.i,1);renderTravelerList()});
-  });
 }
-
-// Currency chips
-document.getElementById('cur-grid').addEventListener('click',function(e){
-  var chip=e.target.closest('.cur-chip');if(!chip)return;
-  var cur=chip.dataset.cur;
-  if(cur==='THB')return;
-  chip.classList.toggle('on');
-  var sel=Array.from(document.querySelectorAll('.cur-chip.on')).map(function(c){return c.dataset.cur});
-  setupData.currencies=sel.includes('THB')?sel:['THB'].concat(sel);
-});
-
-// Extra cats
-document.getElementById('extra-grid').addEventListener('click',function(e){
-  var chip=e.target.closest('.extra-chip');if(!chip)return;
-  chip.classList.toggle('on');
-  var cat=chip.dataset.cat,idx=setupData.extraCats.indexOf(cat);
-  if(idx>=0)setupData.extraCats.splice(idx,1);else setupData.extraCats.push(cat);
-});
-
-// Create trip
-document.getElementById('btn-create-trip').addEventListener('click',function(){
-  var name=document.getElementById('s-name').value.trim();
-  if(!name){toast('⚠️ กรุณากรอกชื่อทริป');return}
+function renderSetupRates(){
+  var f=setupForeign();
+  $('s-rates-wrap').style.display=f.length?'':'none';
+  f.forEach(function(c){
+    if(setup.rates[c]===undefined){
+      if(setup.live&&setup.live[c])setup.rates[c]=setup.live[c];
+      else if(setup.base==='THB')setup.rates[c]=DEFAULT_RATES[c];
+    }
+  });
+  $('s-rates').innerHTML=f.map(function(c){
+    return '<div class="rate-row"><span class="cur">'+c+'</span><span class="eq">1 '+c+' =</span>'+
+      '<input class="f-in" type="number" inputmode="decimal" step="any" data-rate="'+c+'" value="'+(setup.rates[c]!==undefined?setup.rates[c]:'')+'">'+
+      '<span class="unit">'+setup.base+'</span></div>';
+  }).join('');
+  $('s-rate-hint').textContent=setup.live?'เติมเรทตลาดล่าสุดให้แล้ว แก้เป็นเรทที่แลกจริงได้ · ใช้เรทเดียวทั้งทริป':'ใส่เรทที่แลกจริง · ใช้เรทเดียวทั้งทริป แก้ทีหลังได้';
+}
+function renderSetupMode(){
+  document.querySelectorAll('.mode-card').forEach(function(b){b.classList.toggle('on',b.dataset.mode===setup.mode)});
+  $('s-pool-init').style.display=setup.mode==='pool'?'':'none';
+  var mc=setupForeign()[0]||setup.base;
+  $('s-pool-amt').placeholder=SYM[mc]+' 0';
+  $('s-pool-hint').textContent='บันทึกเป็นสกุล '+mc+' ให้ทั้ง '+setup.members.length+' คน · เติมเพิ่มระหว่างทริปได้';
+}
+function renderSetupCats(){
+  $('s-cats-def').innerHTML=DEFAULT_CATS.map(function(k){var c=catOf(k);return '<span class="ch">'+c.e+' '+c.l+'</span>'}).join('');
+  $('s-cats-extra').innerHTML=EXTRA_CATS.map(function(k){
+    var c=catOf(k),on=setup.extra.indexOf(k)>=0;
+    return '<button class="ch'+(on?' on':'')+'" data-act="s-cat" data-cat="'+k+'">'+c.e+' '+c.l+'</button>';
+  }).join('');
+}
+function createTrip(){
+  var btn=$('btn-create');btn.disabled=true;btn.textContent='⏳ กำลังสร้าง...';
+  var foreign=setupForeign(),rates={};
+  foreign.forEach(function(c){rates[c]=+setup.rates[c]});
   var code=genCode();
-  trip={
-    code:code,name:name,
-    dateStart:document.getElementById('s-start').value,
-    dateEnd:document.getElementById('s-end').value,
-    destination:document.getElementById('s-dest').value.trim(),
-    travelers:setupData.travelers.slice(),
-    currencies:setupData.currencies.slice(),
-    baseCurrency:document.getElementById('s-base').value,
-    categories:DEFAULT_CATS.concat(setupData.extraCats),
-    expenses:[],rates:{},createdAt:Date.now()
+  var t={
+    code:code,name:$('s-name').value.trim(),destination:$('s-dest').value.trim(),
+    dateStart:$('s-start').value,dateEnd:$('s-end').value,
+    travelers:setup.members.slice(),currencies:setup.currencies.slice(),
+    baseCurrency:setup.base,mainCurrency:foreign[0]||setup.base,
+    categories:DEFAULT_CATS.concat(setup.extra),mode:setup.mode,
+    rates:rates,createdAt:Date.now(),v:2
   };
-  expenses=[];customRates={};
-  var btn=document.getElementById('btn-create-trip');
-  btn.textContent='⏳ กำลังสร้าง...';btn.disabled=true;
-  db.ref('trips/'+code).set(trip).then(function(){
-    btn.textContent='🚀 สร้างทริป!';btn.disabled=false;
-    incCounter();
-    saveRecentTrip(code);
-    showScreen('s-app');initApp();
-    listenTrip(code);
-    setTimeout(function(){showCodeModal()},400);
+  db.ref('trips/'+code).set(t).then(function(){
+    applyTrip(t);incCounter();saveRecent();
+    var init=+$('s-pool-amt').value;
+    var p=(setup.mode==='pool'&&init>0)?addContributionAll(init,mainCur(),'day1'):Promise.resolve();
+    return p.then(function(){
+      btn.disabled=false;btn.textContent='🚀 สร้างทริป';
+      enterApp();listen();
+      toast('🎉 สร้างทริปแล้ว! แชร์โค้ด '+code+' ให้เพื่อน',{label:'แชร์',fn:shareTrip});
+    });
   }).catch(function(){
-    btn.textContent='🚀 สร้างทริป!';btn.disabled=false;
-    toast('❌ เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
-  });
-});
-
-// ══════════════════════════════════════
-// REALTIME LISTENER
-// ══════════════════════════════════════
-var tripListener = null;
-function listenTrip(code){
-  if(tripListener) tripListener.off();
-  tripListener = db.ref('trips/'+code);
-  // update status
-  document.getElementById('s-dot').className='s-dot live';
-  document.getElementById('s-txt').textContent='Live · sync แล้ว';
-  tripListener.on('value', function(snap){
-    if(!snap.exists()) return;
-    var data = snap.val();
-    var newExp = data.expenses || [];
-    var newRates = data.rates || {};
-    // อัปเดตถ้ามีการเปลี่ยนแปลงจากคนอื่น
-    expenses = newExp;
-    customRates = newRates;
-    trip = data;
-    renderSummaryStrip();
-    renderList();
-    if(document.getElementById('tab-summary').classList.contains('active')) renderSummary();
+    btn.disabled=false;btn.textContent='🚀 สร้างทริป';toast('❌ สร้างไม่สำเร็จ ลองใหม่อีกครั้ง');
   });
 }
 
-// ══════════════════════════════════════
-// RECENT TRIPS (localStorage เก็บแค่ code+ชื่อ)
-// ══════════════════════════════════════
-function saveRecentTrip(code){
-  var recent = getRecentTrips();
-  recent = recent.filter(function(r){return r.code!==code});
-  recent.unshift({code:code, name:trip.name, dest:trip.destination});
-  if(recent.length>5) recent=recent.slice(0,5);
-  localStorage.setItem('jodyub_recent', JSON.stringify(recent));
-  renderRecentTrips();
+// ══════════ RENDER: HEADER ══════════
+function renderAll(){
+  if(!trip)return;
+  renderHeader();
+  document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('on',v.id==='v-'+view)});
+  document.querySelectorAll('.nav-b').forEach(function(b){b.classList.toggle('on',b.dataset.view===view)});
+  if(view==='home')renderHome();
+  if(view==='list')renderList();
+  if(view==='settle')renderSettle();
+  if(view==='trip'){
+    // อย่าล้างช่องที่กำลังพิมพ์อยู่ ตอนเพื่อนอัปเดตข้อมูล
+    var a=document.activeElement;
+    if(!(a&&$('v-trip').contains(a)&&a.tagName==='INPUT'&&$('v-trip').innerHTML))renderTrip();
+  }
 }
-function getRecentTrips(){
-  try{return JSON.parse(localStorage.getItem('jodyub_recent')||'[]')}catch(e){return[]}
+function dateRange(){
+  var s=parseD(trip.dateStart),e=parseD(trip.dateEnd);
+  if(!s)return '';
+  var o={day:'numeric',month:'short'};
+  return s.toLocaleDateString('th-TH',o)+(e&&e>s?' – '+e.toLocaleDateString('th-TH',o):'');
 }
-function removeRecentTrip(code){
-  var recent=getRecentTrips().filter(function(r){return r.code!==code});
-  localStorage.setItem('jodyub_recent',JSON.stringify(recent));
-  renderRecentTrips();
-  toast('🗑 ลบทริปออกจากรายการแล้ว');
-}
-
-function renderRecentTrips(){
-  var recent = getRecentTrips();
-  var wrap = document.getElementById('recent-trips-wrap');
-  if(!wrap) return;
-  if(!recent.length){wrap.style.display='none';return}
-  wrap.style.display='block';
-  wrap.innerHTML='<div class="land-card-title">🕐 ทริปล่าสุด <span style="font-size:20px;color:var(--muted);font-weight:400;letter-spacing:0">(กดค้างเพื่อลบ)</span></div>'+
-    recent.map(function(r){
-      return '<div class="recent-trip-item" data-code="'+r.code+'" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;transition:all .2s;user-select:none;-webkit-user-select:none;">'+
-        '<div style="flex:1">'+
-          '<div style="font-size:18px;font-weight:600">'+esc(r.name)+'</div>'+
-          '<div style="font-size:20px;color:var(--muted);margin-top:2px">'+esc(r.dest||'')+'</div>'+
-        '</div>'+
-        '<div style="font-family:monospace;font-size:20px;color:var(--purple);font-weight:700;margin-right:4px">'+r.code+'</div>'+
-        '<div style="color:var(--muted);font-size:18px">→</div>'+
-      '</div>';
-    }).join('');
-
-  wrap.querySelectorAll('.recent-trip-item').forEach(function(el){
-    var pressTimer = null;
-    var isLongPress = false;
-
-    // Long press — mobile
-    el.addEventListener('touchstart', function(e){
-      isLongPress = false;
-      pressTimer = setTimeout(function(){
-        isLongPress = true;
-        el.style.background = 'rgba(248,81,73,0.15)';
-        el.style.borderColor = 'var(--red)';
-        if(confirm('ลบ "'+el.querySelector('div div').textContent+'" ออกจากรายการ?')){
-          removeRecentTrip(el.dataset.code);
-        } else {
-          el.style.background = 'var(--surface2)';
-          el.style.borderColor = 'var(--border)';
-        }
-      }, 600);
-    }, {passive:true});
-
-    el.addEventListener('touchend', function(){
-      clearTimeout(pressTimer);
-    });
-
-    el.addEventListener('touchmove', function(){
-      clearTimeout(pressTimer);
-    });
-
-    // Right click — desktop
-    el.addEventListener('contextmenu', function(e){
-      e.preventDefault();
-      el.style.background = 'rgba(248,81,73,0.15)';
-      el.style.borderColor = 'var(--red)';
-      if(confirm('ลบ "'+el.querySelector('div div').textContent+'" ออกจากรายการ?')){
-        removeRecentTrip(el.dataset.code);
-      } else {
-        el.style.background = 'var(--surface2)';
-        el.style.borderColor = 'var(--border)';
-      }
-    });
-
-    // Normal click
-    el.addEventListener('click', function(){
-      if(isLongPress) return;
-      var code=this.dataset.code;
-      toast('⏳ กำลังโหลด...');
-      db.ref('trips/'+code).once('value').then(function(snap){
-        if(!snap.exists()){toast('❌ ไม่พบทริปนี้แล้ว');removeRecentTrip(code);return}
-        trip=snap.val();expenses=trip.expenses||[];customRates=trip.rates||{};
-        saveRecentTrip(code);
-        showScreen('s-app');initApp();listenTrip(code);
-      });
-    });
-  });
-}
-renderRecentTrips();
-checkURLTrip();
-
-function initApp(){
-  document.getElementById('app-name').textContent=trip.name;
-  document.getElementById('app-code').textContent=trip.code;
-  document.getElementById('modal-code-txt').textContent=trip.code;
-  document.getElementById('s-txt').textContent='localStorage';
-  document.getElementById('s-dot').className='s-dot live';
-
-  selCat=trip.categories[0]||'food';
-  selPayer=trip.travelers[0]||'';
-  selPay='cash';filterDay='all';showBase=false;
-
-  buildDaySelect();buildCurSelect();buildCatGrid();buildPayerRow();
-  renderSummaryStrip();renderDayFilter();renderList();renderSummary();
+function renderHeader(){
+  $('hd-name').textContent=trip.name||'ทริป';
+  var flag=FLAG[mainCur()]&&mainCur()!==trip.baseCurrency?FLAG[mainCur()]+' ':'';
+  $('hd-sub').textContent=flag+[trip.destination,dateRange()].filter(Boolean).join(' · ')||('โค้ด '+trip.code);
+  var tg=$('cur-toggle');
+  if(mainCur()!==trip.baseCurrency){
+    tg.style.display='';
+    tg.textContent=(SYM[dispCur()]||dispCur())+' ⇄';
+    tg.setAttribute('aria-label','สลับสกุลเงินที่แสดง');
+  } else tg.style.display='none';
+  var t=arr(trip.travelers),shown=t.slice(0,5);
+  $('hd-avs').innerHTML=shown.map(function(n){return av(n)}).join('')+(t.length>5?'<span class="av more">+'+(t.length-5)+'</span>':'');
+  var days=buildDays(),total=days[days.length-1].n,i=todayIdx(),pct,l,r;
+  if(i==null){l='ทริป '+total+' วัน';r=t.length+' คน';pct=0}
+  else if(i<1){l='ยังไม่เริ่ม';r='อีก '+(1-i)+' วัน';pct=0}
+  else if(i>total){l='จบทริปแล้ว';r=total+' วัน';pct=100}
+  else{l='ความคืบหน้าทริป';r='Day '+i+' จาก '+total;pct=i/total*100}
+  $('prog-l').textContent=l;$('prog-r').textContent=r;$('prog-bar').style.width=pct+'%';
 }
 
-// ── Day select ──
-function buildDaySelect(){
-  var sel=document.getElementById('f-day');sel.innerHTML='';
-  buildDays().forEach(function(d){
-    var o=document.createElement('option');o.value=d.key;o.textContent=d.label;sel.appendChild(o);
-  });
+// ══════════ RENDER: HOME ══════════
+function txRow(from,to,amount,note,color){
+  return '<div class="tx">'+av(from)+'<span class="tx-arrow">→</span>'+av(to)+
+    '<div class="tx-names">'+payerLabel(from)+' → '+payerLabel(to)+(note?'<small>'+note+'</small>':'')+'</div>'+
+    '<div class="tx-amt"><b class="num" style="color:'+(color||'var(--lime)')+'">'+money(amount)+'</b><small class="num">'+moneySub(amount)+'</small></div></div>';
 }
-
-// ── Currency selects ──
-function buildCurSelect(){
-  var tc=tripCurs(),sorted=tc.concat(trip.currencies.filter(function(c){return c===trip.baseCurrency}));
-  ['f-cur','f-cur2'].forEach(function(id){
-    var sel=document.getElementById(id);sel.innerHTML='';
-    sorted.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
-    if(sorted.length)sel.value=sorted[0];
-  });
-  // sync f-cur and f-cur2
-  document.getElementById('f-cur').addEventListener('change',function(){document.getElementById('f-cur2').value=this.value});
-  document.getElementById('f-cur2').addEventListener('change',function(){document.getElementById('f-cur').value=this.value});
-}
-
-// ── Category grid ──
-function buildCatGrid(){
-  var grid=document.getElementById('cat-grid-app');
-  var cats=trip.categories||DEFAULT_CATS;
-  // เสมอ 4 คอลัมน์ ไม่เกินหน้าจอ
-  grid.style.gridTemplateColumns='repeat(4,1fr)';
-  grid.innerHTML=cats.map(function(cat){
-    var c=ALL_CATS[cat]||{emoji:'📦',label:cat,color:'#7d8590'};
-    var on=cat===selCat;
-    return '<div class="cat-btn-app'+(on?' on':'')+'" data-cat="'+cat+'" style="'+(on?'border-color:'+c.color+';background:'+c.color+'22':'')+'">'+
-      '<span class="ci">'+c.emoji+'</span><span class="cl" style="color:'+(on?c.color:'')+'">'+c.label.split(' ')[0]+'</span></div>';
+function poolRefundRows(r,limit){
+  var rows=r.people.map(function(n){return {n:n,v:r.poolNet[n]}}).filter(function(x){return Math.abs(x.v)>0.5});
+  rows.sort(function(a,b){return b.v-a.v});
+  if(limit)rows=rows.slice(0,limit);
+  return rows.map(function(x){
+    return x.v>0?txRow('pool',x.n,x.v,'คืนเงินกองที่เหลือ'):txRow(x.n,'pool',-x.v,'ใช้กองเกินที่ใส่ไว้','var(--red)');
   }).join('');
-  grid.querySelectorAll('.cat-btn-app').forEach(function(b){
-    b.addEventListener('click',function(){
-      selCat=this.dataset.cat;buildCatGrid();
-    });
-  });
 }
+function renderHome(){
+  var r=bal(),pool=trip.mode==='pool',h='';
+  var hasAny=expenses.length||contributions.length;
 
-// ── Payer row ──
-function buildPayerRow(){
-  var row=document.getElementById('payer-row');
-  row.innerHTML=trip.travelers.map(function(name,i){
-    var c=AVATAR_COLORS[i%AVATAR_COLORS.length],on=name===selPayer;
-    return '<div class="payer-chip'+(on?' on':'')+'" data-payer="'+esc(name)+'" style="'+(on?'border-color:'+c+';background:'+c+'22':'')+'">'+
-      '<div class="payer-av" style="background:'+c+'20;color:'+c+'">'+name[0].toUpperCase()+'</div>'+esc(name)+'</div>';
-  }).join('');
-  row.querySelectorAll('.payer-chip').forEach(function(b){
-    b.addEventListener('click',function(){selPayer=this.dataset.payer;buildPayerRow()});
-  });
-}
-
-// ── Pay method ──
-document.getElementById('pay-row').addEventListener('click',function(e){
-  var btn=e.target.closest('.pay-btn');if(!btn)return;
-  selPay=btn.dataset.pay;
-  document.querySelectorAll('.pay-btn').forEach(function(b){b.classList.remove('on')});
-  btn.classList.add('on');
-});
-
-// ── Tab switching ──
-document.querySelector('.tab-bar').addEventListener('click',function(e){
-  var btn=e.target.closest('.tab-btn');if(!btn)return;
-  var tab=btn.dataset.tab;
-  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
-  document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active')});
-  btn.classList.add('active');
-  document.getElementById('tab-'+tab).classList.add('active');
-  if(tab==='summary')renderSummary();
-});
-
-// ══════════════════════════════════════
-// ADD EXPENSE
-// ══════════════════════════════════════
-document.getElementById('btn-add').addEventListener('click',addExpense);
-document.getElementById('f-name').addEventListener('keydown',function(e){if(e.key==='Enter')addExpense()});
-
-function addExpense(){
-  var day=document.getElementById('f-day').value;
-  var name=document.getElementById('f-name').value.trim();
-  var amount=parseFloat(document.getElementById('f-amount').value);
-  var cur=document.getElementById('f-cur2').value;
-  var note=document.getElementById('f-note').value.trim();
-  if(!name){toast('⚠️ กรอกชื่อรายการด้วย');return}
-  if(!amount||amount<=0){toast('⚠️ กรอกจำนวนเงินด้วย');return}
-  var e={id:Date.now().toString(),day:day,cat:selCat,name:name,amount:amount,
-    currency:cur,note:note,pay:selPay,payer:selPayer,thb:toBase(amount,cur),ts:Date.now()};
-  expenses.push(e);saveExpenses();
-  document.getElementById('f-name').value='';
-  document.getElementById('f-amount').value='';
-  document.getElementById('f-note').value='';
-  toast('✅ เพิ่ม "'+name+'" แล้ว');
-  // switch to list
-  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
-  document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active')});
-  document.querySelector('[data-tab="list"]').classList.add('active');
-  document.getElementById('tab-list').classList.add('active');
-  filterDay='all';renderDayFilter();renderList();renderSummaryStrip();
-}
-
-// ══════════════════════════════════════
-// SUMMARY STRIP
-// ══════════════════════════════════════
-function renderSummaryStrip(){
-  var strip=document.getElementById('sum-strip');
-  var totalBase=expenses.reduce(function(s,e){return s+e.thb},0);
-  var days=buildDays().length;
-  var tc=tripCurs();
-  var curMap={};
-  expenses.forEach(function(e){if(!curMap[e.currency])curMap[e.currency]=0;curMap[e.currency]+=e.amount});
-
-  var mainTotal,avgVal;
-  if(showBase||!tc.length){
-    mainTotal=fmt(totalBase,trip.baseCurrency);
-    avgVal=fmt(days>0?totalBase/days:0,trip.baseCurrency);
-  } else if(tc.length===1&&curMap[tc[0]]){
-    mainTotal=fmt(curMap[tc[0]],tc[0]);
-    avgVal=fmt(days>0?(curMap[tc[0]]||0)/days:0,tc[0]);
+  // hero
+  if(pool){
+    var left=r.poolLeft,used=r.contribTotal>0?Math.min(100,r.poolSpent/r.contribTotal*100):0;
+    var low=r.contribTotal>0&&left/r.contribTotal<0.15;
+    h+='<div class="card hero"><div class="hero-l">💰 เงินกองกลางคงเหลือ</div>'+
+      '<div class="hero-v num'+(left<-0.5?' neg':'')+'">'+money(left)+'</div><div class="hero-s num">'+moneySub(left)+'</div>'+
+      (r.contribTotal>0?'<div class="hero-bar"><i style="width:'+used+'%;background:var(--vio)"></i><i style="flex:1;background:var(--lime)"></i></div>'+
+        '<div class="hero-row"><span>ใช้ไป <b>'+money(r.poolSpent)+'</b></span><span>เก็บมา <b>'+money(r.contribTotal)+'</b></span></div>'
+        :'<div class="hero-s" style="margin-top:10px">ยังไม่มีเงินในกอง เริ่มจากเก็บเงินก่อน</div>')+
+      (low?'<div class="warn">⚠️ กองเหลือไม่ถึง 15% แล้ว ควรเติมเพิ่ม</div>':'')+
+      '<div class="hero-act"><button class="btn btn-lime" data-act="topup">+ เติมกอง</button></div></div>';
   } else {
-    mainTotal=fmt(totalBase,trip.baseCurrency);
-    avgVal=fmt(days>0?totalBase/days:0,trip.baseCurrency);
+    var cnt=expenses.length;
+    h+='<div class="card hero"><div class="hero-l">🤝 ค่าใช้จ่ายรวมของกลุ่ม</div>'+
+      '<div class="hero-v num">'+money(r.total)+'</div><div class="hero-s num">'+moneySub(r.total)+'</div>'+
+      '<div class="hero-row" style="margin-top:14px"><span>'+cnt+' รายการ</span><span>ต่อคนเฉลี่ย <b>'+money(r.total/Math.max(1,r.people.length))+'</b></span></div></div>';
   }
 
-  var btnLabel=showBase?'🔄 '+tc[0]:'🔄 '+(tc[0]||trip.baseCurrency);
-  var btnActive=showBase?'active':'';
+  if(!hasAny){
+    h+='<div class="card empty"><b>🧾</b>ยังไม่มีรายการ<br>กด + ด้านล่างเพื่อจดรายการแรก</div>';
+    $('v-home').innerHTML=h;return;
+  }
 
-  strip.style.gridTemplateColumns=tc.length?'1fr 1fr auto':'1fr 1fr';
-  strip.innerHTML=
-    '<div class="sum-cell"><div class="sum-label">รวมทั้งหมด</div>'+
-      '<div class="sum-value" style="color:var(--green)">'+mainTotal+'</div>'+
-      '<div class="sum-sub">'+expenses.length+' รายการ</div></div>'+
-    '<div class="sum-cell"><div class="sum-label">เฉลี่ย/วัน</div>'+
-      '<div class="sum-value" style="color:var(--blue)">'+avgVal+'</div>'+
-      '<div class="sum-sub">'+days+' วัน</div></div>'+
-    (tc.length?'<div class="sum-cell" style="display:flex;align-items:center;padding:10px 12px">'+
-      '<button class="cur-toggle-btn '+btnActive+'" id="cur-toggle">'+btnLabel+'</button></div>':'');
+  // stats
+  var days=buildDays(),i=todayIdx(),total=days[days.length-1].n;
+  var elapsed=i==null?Math.max(1,new Set(expenses.map(function(e){return e.day})).size):Math.max(1,Math.min(i,total));
+  var tk=todayKey(),todaySum=expenses.filter(function(e){return e.day===tk}).reduce(function(s,e){return s+baseOf(e)},0);
+  h+='<div class="stats">'+[
+    [i!=null&&i>=1&&i<=total?'วันนี้':dayLabel(tk).split(' · ')[0],todaySum,''],
+    ['เฉลี่ย/วัน',r.total/elapsed,elapsed+' วัน'],
+    ['ต่อคน',r.total/Math.max(1,r.people.length),r.people.length+' คน']
+  ].map(function(s){return '<div class="stat"><div class="stat-l">'+s[0]+'</div><div class="stat-v num">'+money(s[1])+'</div><div class="stat-s">'+s[2]+'</div></div>'}).join('')+'</div>';
 
-  var tb=document.getElementById('cur-toggle');
-  if(tb)tb.addEventListener('click',function(){
-    showBase=!showBase;renderSummaryStrip();renderList();renderSummary();
-  });
+  // settlement preview
+  var tx=settle(r.debtNet);
+  h+='<div class="card"><div class="card-t"><h3>🔁 '+(pool?'ถ้าปิดทริปวันนี้':'ใครต้องโอนให้ใคร')+'</h3><button class="link" data-act="view" data-view="settle">ดูทั้งหมด →</button></div>';
+  var body='';
+  if(pool)body+=poolRefundRows(r,2);
+  body+=tx.slice(0,pool?2:3).map(function(x){return txRow(x.from,x.to,x.amount,pool?'สำรองจ่าย':'')}).join('');
+  h+=(body||'<div class="done">🎉 ยังไม่มีใครติดใคร</div>')+'</div>';
+
+  // categories
+  var byCat={};expenses.forEach(function(e){byCat[e.cat]=(byCat[e.cat]||0)+baseOf(e)});
+  var keys=Object.keys(byCat).sort(function(a,b){return byCat[b]-byCat[a]});
+  if(keys.length){
+    var max=byCat[keys[0]]||1;
+    h+='<div class="card"><div class="card-t"><h3>📊 ใช้ไปกับอะไร</h3></div>'+keys.map(function(k){
+      var c=catOf(k),pct=r.total?Math.round(byCat[k]/r.total*100):0;
+      return '<div class="cat"><div class="cat-h"><span>'+c.e+' '+esc(c.l)+'<em>'+pct+'%</em></span><span>'+money(byCat[k])+'</span></div>'+
+        '<div class="bar"><i style="width:'+(byCat[k]/max*100)+'%;background:'+c.c+'"></i></div></div>';
+    }).join('')+'</div>';
+  }
+
+  // recent
+  var recent=expenses.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0)}).slice(0,4);
+  if(recent.length)h+='<div class="card list-card"><div class="card-t" style="margin:12px 0 4px"><h3>🕐 ล่าสุด</h3><button class="link" data-act="view" data-view="list">ดูทั้งหมด →</button></div>'+recent.map(exRow).join('')+'</div>';
+
+  $('v-home').innerHTML=h;
+}
+function splitChip(e){
+  var w=splitOf(e,trip.travelers),n=trip.travelers.length;
+  if(w.length===n&&trip.travelers.every(function(t){return w.indexOf(t)>=0}))return '<span class="chip">หารทุกคน</span>';
+  if(w.length===1)return '<span class="chip">ของ '+esc(w[0])+'</span>';
+  return '<span class="chip">หาร '+w.length+' คน</span>';
+}
+function exRow(e){
+  var c=catOf(e.cat);
+  var sub=e.currency!==trip.baseCurrency?'≈ '+fmt(baseOf(e),trip.baseCurrency):(mainCur()!==trip.baseCurrency?'≈ '+fmt(fromBase(baseOf(e),mainCur()),mainCur()):'');
+  return '<button class="ex" data-act="edit-exp" data-id="'+esc(e._key||e.id)+'"><span class="ex-ic" style="background:'+c.c+'1f">'+c.e+'</span>'+
+    '<span class="ex-b"><span class="ex-n" style="display:block">'+esc(e.name)+'</span><span class="ex-m">'+av(e.payer,'mini-av')+payerLabel(e.payer)+' · '+splitChip(e)+'</span></span>'+
+    '<span class="ex-r"><b>'+fmt(+e.amount,e.currency)+'</b><small class="num">'+sub+'</small></span></button>';
 }
 
-// ══════════════════════════════════════
-// LIST
-// ══════════════════════════════════════
-function renderDayFilter(){
-  var wrap=document.getElementById('day-scroll');
-  var days=buildDays();
-  wrap.innerHTML='<div class="day-chip-filter'+(filterDay==='all'?' active':'')+'" data-day="all">ทั้งหมด</div>'+
-    days.map(function(d){
-      return '<div class="day-chip-filter'+(filterDay===d.key?' active':'')+'" data-day="'+d.key+'">'+
-        d.key.replace('day','D')+'</div>';
-    }).join('');
-  wrap.querySelectorAll('.day-chip-filter').forEach(function(c){
-    c.addEventListener('click',function(){filterDay=this.dataset.day;renderDayFilter();renderList()});
-  });
-}
-
+// ══════════ RENDER: LIST ══════════
 function renderList(){
-  var list=document.getElementById('expense-list');
-  var tc=tripCurs();
-  var filtered=expenses.filter(function(e){return filterDay==='all'||e.day===filterDay});
-  filtered.sort(function(a,b){
-    var da=parseInt((a.day||'day0').replace('day',''))||0;
-    var db=parseInt((b.day||'day0').replace('day',''))||0;
-    return da!==db?da-db:a.ts-b.ts;
+  var days=buildDays(),cnt={};
+  expenses.forEach(function(e){cnt[e.day]=(cnt[e.day]||0)+1});
+  var h='<div class="days">'+
+    '<button class="day-c'+(filterDay==='all'?' on':'')+'" data-act="filter-day" data-day="all">ทั้งหมด · '+expenses.length+'</button>'+
+    days.map(function(d){
+      return '<button class="day-c'+(filterDay===d.key?' on':'')+(cnt[d.key]?'':' dim')+'" data-act="filter-day" data-day="'+d.key+'">D'+d.n+(d.short?' · '+d.short:'')+'</button>';
+    }).join('')+'</div>';
+  var list=expenses.filter(function(e){return filterDay==='all'||e.day===filterDay});
+  list.sort(function(a,b){
+    var da=parseInt((a.day||'').replace('day',''),10)||0,db_=parseInt((b.day||'').replace('day',''),10)||0;
+    return da!==db_?da-db_:(a.ts||0)-(b.ts||0);
   });
-  document.getElementById('list-count').textContent=filtered.length+' รายการ';
-  if(!filtered.length){
-    list.innerHTML='<div class="empty"><div class="empty-icon">🧾</div><p>ยังไม่มีรายการ<br>เพิ่มค่าใช้จ่ายแรกได้เลย!</p></div>';
-    return;
-  }
-  var lastDay='';
-  list.innerHTML=filtered.map(function(e,i){
-    var cd=ALL_CATS[e.cat]||{emoji:'📦',label:e.cat,color:'#7d8590'};
-    var pc=AVATAR_COLORS[trip.travelers.indexOf(e.payer)%AVATAR_COLORS.length]||'#7d8590';
-    var payIcon={cash:'💵',card:'💳',travel:'🪙'}[e.pay]||'💵';
-    var dayHd='';
-    if(e.day&&e.day!==lastDay){
-      lastDay=e.day;
-      var dobj=buildDays().find(function(d){return d.key===e.day});
-      dayHd='<div class="day-divider">'+(dobj?dobj.label:e.day.replace('day','Day '))+'</div>';
-    }
-    // amount display
-    var mainAmt,subAmt;
-    if(showBase||!tc.length){
-      mainAmt=fmt(e.thb,trip.baseCurrency);
-      subAmt=e.currency!==trip.baseCurrency?fmt(e.amount,e.currency):'';
-    } else {
-      mainAmt=fmt(e.amount,e.currency);
-      subAmt=e.currency!==trip.baseCurrency?'≈ '+fmt(e.thb,trip.baseCurrency):'';
-    }
-    return dayHd+
-      '<div class="expense-card">'+
-        '<div class="e-day-badge">'+e.day.replace('day','D')+'</div>'+
-        '<div class="e-body">'+
-          '<div class="e-name">'+esc(e.name)+'</div>'+
-          '<div class="e-tags">'+
-            '<span class="e-tag" style="background:'+cd.color+'22;color:'+cd.color+'">'+cd.emoji+' '+cd.label+'</span>'+
-            '<span class="e-tag" style="background:'+pc+'22;color:'+pc+'">'+esc(e.payer)+'</span>'+
-            '<span style="font-size:18px">'+payIcon+'</span>'+
-          '</div>'+
-          (e.note?'<div class="e-note">📝 '+esc(e.note)+'</div>':'')+
-        '</div>'+
-        '<div class="e-right">'+
-          '<div class="e-amt" style="color:'+cd.color+'">'+mainAmt+'</div>'+
-          (subAmt?'<div class="e-sub">'+subAmt+'</div>':'')+
-        '</div>'+
-        '<button class="e-del" data-id="'+e.id+'">✕</button>'+
-      '</div>';
-  }).join('');
-
-  list.querySelectorAll('.e-del').forEach(function(b){
-    b.addEventListener('click',function(){
-      var id=this.dataset.id;
-      expenses=expenses.filter(function(e){return e.id!==id});
-      saveExpenses();toast('🗑 ลบแล้ว');
-      renderList();renderSummaryStrip();renderSummary();
-    });
-  });
-}
-
-// ══════════════════════════════════════
-// SUMMARY
-// ══════════════════════════════════════
-function renderSummary(){
-  renderRates();renderChart();renderCatAccordion();renderPayerSum();renderDayBars();
-}
-
-// Rates
-function renderRates(){
-  var wrap=document.getElementById('rates-wrap');
-  var tc=tripCurs();
-  if(!tc.length){wrap.innerHTML='<div style="color:var(--muted);font-size:20px">ทริปนี้ใช้สกุลเงินเดียว</div>';return}
-  wrap.innerHTML=tc.map(function(cur){
-    var rate=customRates[cur]!==undefined?customRates[cur]:(DEFAULT_RATES[cur]||1);
-    var edited=customRates[cur]!==undefined;
-    return '<div class="rate-card"><div class="rate-row">'+
-      '<div class="rate-label">'+cur+'</div>'+
-      '<div class="rate-eq">1 '+cur+' =</div>'+
-      '<input class="rate-inp" type="number" value="'+rate+'" min="0" step="0.0001" data-cur="'+cur+'">'+
-      '<div class="rate-unit">'+trip.baseCurrency+'</div>'+
-      '<button class="rate-reset'+(edited?' edited':'')+'" data-cur="'+cur+'" title="รีเซ็ต">↺</button>'+
-    '</div>'+
-    '<div class="rate-hint">↺ = default · <span style="color:var(--orange)">สีส้ม</span> = แก้ไขเอง</div></div>';
-  }).join('');
-
-  wrap.querySelectorAll('.rate-inp').forEach(function(inp){
-    inp.addEventListener('change',function(){
-      var cur=this.dataset.cur,val=parseFloat(this.value);
-      if(isNaN(val)||val<=0){toast('⚠️ ค่าไม่ถูกต้อง');return}
-      customRates[cur]=val;saveRates();
-      var changed=0;
-      expenses.forEach(function(e){if(e.currency===cur){e.thb=e.amount*val;changed++}});
-      if(changed){saveExpenses();renderList();renderSummaryStrip();toast('💱 อัปเดต '+cur+' · '+changed+' รายการ')}
-      else toast('💱 บันทึกอัตรา '+cur);
-      renderSummary();
-    });
-  });
-  wrap.querySelectorAll('.rate-reset').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var cur=this.dataset.cur;delete customRates[cur];saveRates();
-      var def=DEFAULT_RATES[cur]||1;
-      expenses.forEach(function(e){if(e.currency===cur)e.thb=e.amount*def});
-      saveExpenses();renderSummary();renderList();renderSummaryStrip();toast('↺ รีเซ็ต '+cur);
-    });
-  });
-}
-
-// Chart
-function renderChart(){
-  var catMap={},totalBase=expenses.reduce(function(s,e){return s+e.thb},0);
-  expenses.forEach(function(e){if(!catMap[e.cat])catMap[e.cat]=0;catMap[e.cat]+=e.thb});
-  var entries=Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a]});
-  if(!entries.length){
-    document.getElementById('chart-legend').innerHTML='<div style="color:var(--muted);font-size:18px">ยังไม่มีข้อมูล</div>';
-    return;
-  }
-  var labels=entries.map(function(c){return (ALL_CATS[c]||{label:c}).label});
-  var data=entries.map(function(c){return catMap[c]});
-  var colors=entries.map(function(c){return (ALL_CATS[c]||{color:'#7d8590'}).color});
-
-  if(donutChart)donutChart.destroy();
-  donutChart=new Chart(document.getElementById('donut-chart'),{
-    type:'doughnut',
-    data:{labels:labels,datasets:[{data:data,backgroundColor:colors,borderWidth:0,hoverOffset:4}]},
-    options:{cutout:'68%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:400}}
-  });
-
-  var tc=tripCurs();
-  document.getElementById('chart-legend').innerHTML=entries.map(function(cat){
-    var cd=ALL_CATS[cat]||{emoji:'📦',label:cat,color:'#7d8590'};
-    var pct=totalBase>0?(catMap[cat]/totalBase*100).toFixed(0):0;
-    var displayAmt;
-    if(showBase||tc.length!==1){displayAmt=fmt(catMap[cat],trip.baseCurrency)}
-    else{
-      var curMap={};expenses.forEach(function(e){if(e.cat===cat){if(!curMap[e.currency])curMap[e.currency]=0;curMap[e.currency]+=e.amount}});
-      var keys=Object.keys(curMap);
-      displayAmt=keys.length===1?fmt(curMap[keys[0]],keys[0]):fmt(catMap[cat],trip.baseCurrency);
-    }
-    return '<div class="legend-row">'+
-      '<div class="legend-dot" style="background:'+cd.color+'"></div>'+
-      '<span class="legend-name">'+cd.emoji+' '+cd.label+'</span>'+
-      '<span class="legend-pct" style="color:'+cd.color+'">'+pct+'%</span>'+
-      '<span class="legend-val">'+displayAmt+'</span></div>';
-  }).join('');
-}
-
-// Category accordion
-function renderCatAccordion(){
-  var totalBase=expenses.reduce(function(s,e){return s+e.thb},0);
-  var catMap={},catItems={};
-  expenses.forEach(function(e){
-    if(!catMap[e.cat]){catMap[e.cat]=0;catItems[e.cat]=[]}
-    catMap[e.cat]+=e.thb;catItems[e.cat].push(e);
-  });
-  var entries=Object.keys(catMap).sort(function(a,b){return catMap[b]-catMap[a]});
-  var tc=tripCurs();
-  var wrap=document.getElementById('cat-accordion');
-  wrap.innerHTML=entries.map(function(cat){
-    var cd=ALL_CATS[cat]||{emoji:'📦',label:cat,color:'#7d8590'};
-    var pct=totalBase>0?(catMap[cat]/totalBase*100).toFixed(0):0;
-    var curMap2={};
-    catItems[cat].forEach(function(e){if(!curMap2[e.currency])curMap2[e.currency]=0;curMap2[e.currency]+=e.amount});
-    var keys2=Object.keys(curMap2);
-    var dispAmt=showBase||tc.length!==1||keys2.length!==1?fmt(catMap[cat],trip.baseCurrency):fmt(curMap2[keys2[0]],keys2[0]);
-    var items=catItems[cat].sort(function(a,b){return a.ts-b.ts}).map(function(e){
-      var eAmt=showBase||e.currency===trip.baseCurrency?fmt(e.thb,trip.baseCurrency):fmt(e.amount,e.currency);
-      return '<div class="cat-acc-item">'+
-        '<div class="acc-day">'+e.day.replace('day','D')+'</div>'+
-        '<div class="acc-name">'+esc(e.name)+(e.note?' <span style="color:var(--muted)">· '+esc(e.note)+'</span>':'')+
-        ' <span style="color:var(--muted);font-size:18px">'+esc(e.payer)+'</span></div>'+
-        '<div class="acc-amt" style="color:'+cd.color+'">'+eAmt+'</div></div>';
+  if(!list.length){
+    h+='<div class="card empty"><b>🧾</b>'+(filterDay==='all'?'ยังไม่มีรายการ':'วันนี้ยังไม่มีรายการ')+'</div>';
+  } else {
+    var groups={},order=[];
+    list.forEach(function(e){if(!groups[e.day]){groups[e.day]=[];order.push(e.day)}groups[e.day].push(e)});
+    h+=order.map(function(d){
+      var sum=groups[d].reduce(function(s,e){return s+baseOf(e)},0);
+      return '<div class="day-h">'+esc(dayLabel(d))+'<em>'+money(sum)+'</em></div><div class="card list-card">'+groups[d].map(exRow).join('')+'</div>';
     }).join('');
-    return '<div class="cat-acc" data-cat="'+cat+'">'+
-      '<div class="cat-acc-hd">'+
-        '<div class="cat-acc-dot" style="background:'+cd.color+'"></div>'+
-        '<div class="cat-acc-name">'+cd.emoji+' '+cd.label+'</div>'+
-        '<div class="cat-acc-pct" style="color:'+cd.color+'">'+pct+'%</div>'+
-        '<div class="cat-acc-amt" style="color:'+cd.color+'">'+dispAmt+'</div>'+
-        '<div class="cat-acc-arr">▼</div>'+
-      '</div>'+
-      '<div class="cat-acc-body">'+items+'</div></div>';
-  }).join('');
-  wrap.querySelectorAll('.cat-acc-hd').forEach(function(hd){
-    hd.addEventListener('click',function(){this.parentElement.classList.toggle('open')});
-  });
-}
-
-// Payer summary
-function renderPayerSum(){
-  var totalBase=expenses.reduce(function(s,e){return s+e.thb},0);
-  var payerMap={};
-  trip.travelers.forEach(function(t){payerMap[t]={base:0,byCur:{},count:0}});
-  expenses.forEach(function(e){
-    if(!payerMap[e.payer])payerMap[e.payer]={base:0,byCur:{},count:0};
-    payerMap[e.payer].base+=e.thb;payerMap[e.payer].count++;
-    if(!payerMap[e.payer].byCur[e.currency])payerMap[e.payer].byCur[e.currency]=0;
-    payerMap[e.payer].byCur[e.currency]+=e.amount;
-  });
-  var tc=tripCurs();
-  document.getElementById('payer-sum').innerHTML=trip.travelers.map(function(name,i){
-    var p=payerMap[name]||{base:0,byCur:{},count:0};
-    var col=AVATAR_COLORS[i%AVATAR_COLORS.length];
-    var keys=Object.keys(p.byCur);
-    var mainAmt,subAmt;
-    if(showBase||tc.length!==1||keys.length!==1){
-      mainAmt=fmt(p.base,trip.baseCurrency);
-      subAmt=(!showBase&&keys.length)?keys.map(function(c){return fmt(p.byCur[c],c)}).join(' + '):'';
-    } else {
-      mainAmt=fmt(p.byCur[keys[0]],keys[0]);subAmt='≈ '+fmt(p.base,trip.baseCurrency);
-    }
-    return '<div class="payer-card-sum">'+
-      '<div class="p-av-big" style="background:'+col+'20;color:'+col+'">'+name[0].toUpperCase()+'</div>'+
-      '<div class="p-info"><div class="p-name">'+esc(name)+'</div><div class="p-count">'+p.count+' รายการ</div></div>'+
-      '<div class="p-total"><div class="p-main" style="color:'+col+'">'+mainAmt+'</div>'+
-      (subAmt?'<div class="p-sub">'+subAmt+'</div>':'')+
-      '</div></div>';
-  }).join('');
-}
-
-// Day bars
-function renderDayBars(){
-  var days=buildDays(),totals={};
-  days.forEach(function(d){totals[d.key]=0});
-  expenses.forEach(function(e){if(totals[e.day]!==undefined)totals[e.day]+=e.thb});
-  var max=Math.max.apply(null,days.map(function(d){return totals[d.key]||0}))||1;
-  var tc=tripCurs();
-  document.getElementById('day-bars').innerHTML=days.map(function(d){
-    var pct=Math.round((totals[d.key]||0)/max*100);
-    var dispAmt;
-    if(showBase||tc.length!==1){
-      dispAmt=fmt(totals[d.key]||0,trip.baseCurrency);
-    } else {
-      var dMap={};
-      expenses.filter(function(e){return e.day===d.key}).forEach(function(e){
-        if(!dMap[e.currency])dMap[e.currency]=0;dMap[e.currency]+=e.amount;
-      });
-      var k=Object.keys(dMap);
-      dispAmt=k.length===1?fmt(dMap[k[0]],k[0]):fmt(totals[d.key]||0,trip.baseCurrency);
-    }
-    return '<div class="day-bar">'+
-      '<div class="day-bar-hd"><span class="day-bar-lbl">'+d.label+'</span>'+
-      '<span class="day-bar-val" style="color:var(--blue)">'+dispAmt+'</span></div>'+
-      '<div class="day-bar-track"><div class="day-bar-fill" style="width:'+pct+'%"></div></div></div>';
-  }).join('');
-}
-
-// ══════════════════════════════════════
-// CODE MODAL
-// ══════════════════════════════════════
-function showCodeModal(){
-  if(trip){
-    document.getElementById('modal-code-txt').textContent=trip.code;
-    var link=getShareLink(trip.code);
-    document.getElementById('modal-link-box').textContent=link;
   }
-  document.getElementById('code-modal').classList.add('open');
+  $('v-list').innerHTML=h;
 }
-document.getElementById('app-code').addEventListener('click',showCodeModal);
-document.getElementById('modal-close').addEventListener('click',function(){
-  document.getElementById('code-modal').classList.remove('open');
-});
-document.getElementById('code-modal').addEventListener('click',function(e){
-  if(e.target===this)this.classList.remove('open');
-});
-document.getElementById('modal-copy').addEventListener('click',function(){
-  if(trip)navigator.clipboard.writeText(trip.code).then(function(){toast('📋 คัดลอก Code แล้ว!')});
-});
-document.getElementById('modal-share').addEventListener('click',function(){
-  if(!trip)return;
-  var link=getShareLink(trip.code);
-  if(navigator.share){
-    navigator.share({title:'Jodyub — '+trip.name,text:'เข้าร่วมทริป '+trip.name+' ได้เลย!',url:link})
-    .catch(function(){});
-  } else {
-    navigator.clipboard.writeText(link).then(function(){toast('🔗 คัดลอก Link แล้ว! แชร์ใน LINE ได้เลย')});
-  }
-});
 
-function shareTrip(){
-  if(!trip)return;
-  var link=getShareLink(trip.code);
-  if(navigator.share){
-    navigator.share({title:'Jodyub — '+trip.name,text:'เข้าร่วมทริป '+trip.name+'!',url:link})
-    .catch(function(){});
-  } else {
-    navigator.clipboard.writeText(link).then(function(){
-      toast('🔗 คัดลอก Link แล้ว! แชร์ใน LINE ได้เลย');
+// ══════════ RENDER: SETTLE ══════════
+function renderSettle(){
+  var r=bal(),pool=usePool(),h='';
+  var tx=settle(r.debtNet);
+  if(pool){
+    h+='<div class="card"><div class="card-t"><h3>💰 คืนเงินกองกลาง</h3><span>กองเหลือ '+money(r.poolLeft)+'</span></div>'+
+      (poolRefundRows(r)||'<div class="done">กองใช้หมดพอดี ไม่ต้องคืนใคร</div>')+
+      '<div class="hint">คิดจาก เงินที่แต่ละคนใส่ − ส่วนที่ตัวเองใช้จากกอง</div></div>';
+  }
+  h+='<div class="card"><div class="card-t"><h3>🔁 '+(pool?'เคลียร์สำรองจ่าย':'ใครต้องโอนให้ใคร')+'</h3><span>'+tx.length+' รายการโอน</span></div>'+
+    (tx.length?tx.map(function(x){return txRow(x.from,x.to,x.amount)}).join(''):'<div class="done">🎉 '+(pool?'ไม่มีใครสำรองจ่ายค้าง':'ยังไม่มีใครติดใคร')+'</div>')+
+    '<div class="hint">หักลบกันแล้ว โอนให้น้อยครั้งที่สุด</div></div>';
+  h+='<button class="btn btn-lime" data-act="copy-summary" style="margin-bottom:12px">📋 คัดลอกสรุปส่ง LINE</button>';
+
+  // members
+  h+='<div class="card"><div class="card-t"><h3>👥 รายคน</h3><span>บวก = ได้คืน · ลบ = ต้องจ่าย</span></div>'+
+    r.people.map(function(n){
+      var v=r.net[n],cls=v>0.5?'pos':v<-0.5?'neg':'zero';
+      var parts=[];
+      if(pool)parts.push('ใส่กอง '+money(r.contrib[n]));
+      parts.push('จ่าย '+money(r.paid[n]));
+      parts.push('ส่วนของตัวเอง '+money(r.share[n]+r.poolShare[n]));
+      return '<div class="mem">'+av(n)+'<div class="mem-b"><div class="mem-n">'+esc(n)+'</div><div class="mem-d num">'+parts.join(' · ')+'</div></div>'+
+        '<span class="pill '+cls+'">'+(v>0.5?'+':v<-0.5?'−':'')+money(Math.abs(v))+'</span></div>';
+    }).join('')+'</div>';
+
+  // contributions history
+  if(pool){
+    var cs=contributions.slice().sort(function(a,b){return (b.ts||0)-(a.ts||0)});
+    h+='<div class="card list-card"><div class="card-t" style="margin:12px 0 4px"><h3>🪙 ประวัติเติมกอง</h3><button class="link" data-act="topup">+ เติมกอง</button></div>'+
+      (cs.length?cs.map(function(c){
+        return '<div class="ex" style="cursor:default">'+av(c.member)+
+          '<span class="ex-b"><span class="ex-n" style="display:block">'+esc(c.member)+' เติมกอง</span><span class="ex-m">'+(c.day?esc(dayLabel(c.day)):'')+'</span></span>'+
+          '<span class="ex-r"><b>'+fmt(+c.amount,c.currency)+'</b></span>'+
+          '<button class="x" data-act="del-contrib" data-id="'+esc(c._key||c.id)+'" aria-label="ลบ">✕</button></div>';
+      }).join(''):'<div class="empty" style="padding:16px">ยังไม่มีการเติมกอง</div>')+'</div>';
+  }
+  $('v-settle').innerHTML=h;
+}
+function summaryText(){
+  var r=bal(),pool=usePool(),lines=['🧾 สรุปทริป '+trip.name];
+  lines.push('ใช้ไปทั้งหมด '+money(r.total)+(moneySub(r.total)?' ('+moneySub(r.total)+')':''));
+  if(pool){
+    lines.push('','💰 กองกลางเหลือ '+money(r.poolLeft));
+    r.people.forEach(function(n){
+      var v=r.poolNet[n];
+      if(v>0.5)lines.push('• คืน '+n+' '+money(v));
+      else if(v<-0.5)lines.push('• '+n+' เติมเข้ากอง '+money(-v));
     });
   }
+  var tx=settle(r.debtNet);
+  lines.push('',pool?'🔁 เคลียร์สำรองจ่าย':'🔁 ใครโอนให้ใคร');
+  if(tx.length)tx.forEach(function(x){lines.push('• '+x.from+' → '+x.to+' '+money(x.amount)+(moneySub(x.amount)?' ('+moneySub(x.amount)+')':''))});
+  else lines.push('• ไม่มี 🎉');
+  lines.push('','ดูรายละเอียด: '+shareLink());
+  return lines.join('\n');
 }
 
-// ══════════════════════════════════════
-// TOAST
-// ══════════════════════════════════════
-function toast(msg){
-  var wrap=document.getElementById('toast-wrap');
-  var t=document.createElement('div');t.className='toast';t.textContent=msg;
-  wrap.appendChild(t);setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},2500);
+// ══════════ RENDER: TRIP SETTINGS ══════════
+function renderTrip(){
+  var h='',foreign=foreignCurs(),r=bal();
+  // share
+  h+='<div class="card"><div class="card-t"><h3>🔗 ชวนเพื่อนเข้าทริป</h3></div>'+
+    '<div class="share-code">'+esc(trip.code)+'</div>'+
+    '<div class="grid2"><button class="btn btn-lime" data-act="share">แชร์ลิงก์</button><button class="btn btn-ghost" data-act="copy-code">คัดลอกโค้ด</button></div></div>';
+  // mode
+  h+='<div class="card"><div class="card-t"><h3>วิธีจ่ายของทริป</h3></div>'+
+    '<div class="seg"><button data-act="set-mode" data-mode="split"'+(trip.mode!=='pool'?' class="on"':'')+'>🤝 ต่างคนต่างจ่าย</button>'+
+    '<button data-act="set-mode" data-mode="pool"'+(trip.mode==='pool'?' class="on"':'')+'>💰 กองกลาง</button></div>'+
+    '<div class="hint">'+(trip.mode==='pool'?'ทุกคนลงเงินรวมกัน จ่ายจากกอง เหลือแล้วคืนตอนจบ':'ใครจ่ายก็จดไว้ จบทริปสรุปให้ว่าใครโอนให้ใคร')+'</div></div>';
+  // members
+  h+='<div class="card"><div class="card-t"><h3>👥 สมาชิก</h3><span>'+trip.travelers.length+' คน</span></div>'+
+    trip.travelers.map(function(n){
+      var used=r.paid[n]>0||r.share[n]>0||r.poolShare[n]>0||r.contrib[n]>0;
+      return '<div class="mem-row">'+av(n)+'<span class="n">'+esc(n)+'</span>'+
+        (used?'':'<button class="x" data-act="rm-member" data-name="'+esc(n)+'" aria-label="ลบ">✕</button>')+'</div>';
+    }).join('')+
+    '<div class="add-row" style="margin-top:8px"><input class="f-in" id="t-mem-in" placeholder="เพิ่มคน" maxlength="20"><button class="btn btn-ghost" data-act="add-member">เพิ่ม</button></div>'+
+    '<div class="hint">คนที่เพิ่มกลางทริป จะไม่ถูกหารรายการที่จดไปก่อนหน้า</div></div>';
+  // currencies
+  h+='<div class="card"><div class="card-t"><h3>💱 สกุลเงิน & เรท</h3><span>สรุปเป็น '+trip.baseCurrency+'</span></div>'+
+    (foreign.length?foreign.map(function(c){
+      return '<div class="rate-row"><span class="cur">'+c+'</span><span class="eq">1 '+c+' =</span>'+
+        '<input class="f-in" type="number" inputmode="decimal" step="any" data-trip-rate="'+c+'" value="'+(+getRate(c).toPrecision(4))+'">'+
+        '<span class="unit">'+trip.baseCurrency+'</span></div>';
+    }).join('')+'<button class="btn btn-ghost" data-act="live-rates" style="margin-top:6px">ดึงเรทตลาดล่าสุด</button>'
+    :'<div class="hint" style="margin:0 0 8px">ทริปนี้ใช้สกุลเดียว</div>')+
+    '<div class="f-l">เพิ่ม/ลดสกุลเงิน</div><div class="chips">'+CUR_LIST.filter(function(c){return c!==trip.baseCurrency}).map(function(c){
+      var on=trip.currencies.indexOf(c)>=0;
+      return '<button class="ch'+(on?' on':'')+'" data-act="t-cur" data-cur="'+c+'">'+FLAG[c]+' '+c+'</button>';
+    }).join('')+'</div>'+
+    (foreign.length>1?'<div class="f-l">สกุลหลัก (กองกลาง/แสดงผล)</div><div class="chips">'+foreign.map(function(c){
+      return '<button class="ch'+(c===mainCur()?' on':'')+'" data-act="t-main" data-cur="'+c+'">'+FLAG[c]+' '+c+'</button>';
+    }).join('')+'</div>':'')+'</div>';
+  // info
+  h+='<div class="card"><div class="card-t"><h3>✏️ ข้อมูลทริป</h3></div>'+
+    '<div class="f-l">ชื่อทริป</div><input class="f-in" id="t-name" maxlength="60" value="'+esc(trip.name)+'">'+
+    '<div class="f-l">จุดหมาย</div><input class="f-in" id="t-dest" maxlength="60" value="'+esc(trip.destination||'')+'">'+
+    '<div class="grid2"><div><div class="f-l">วันเริ่ม</div><input class="f-in" id="t-start" type="date" value="'+esc(trip.dateStart||'')+'"></div>'+
+    '<div><div class="f-l">วันสุดท้าย</div><input class="f-in" id="t-end" type="date" value="'+esc(trip.dateEnd||'')+'"></div></div>'+
+    '<button class="btn btn-ghost" data-act="save-info" style="margin-top:14px">บันทึกข้อมูลทริป</button></div>';
+  h+='<button class="btn btn-ghost" data-act="leave" style="margin-bottom:12px">← ออกไปหน้าแรก</button>';
+  $('v-trip').innerHTML=h;
 }
 
-function shareTrip(){
-  if(!trip)return;
-  var link=getShareLink(trip.code);
-  if(navigator.share){
-    navigator.share({title:'Jodyub — '+trip.name,text:'เข้าร่วมทริป '+trip.name+'!',url:link})
-    .catch(function(){});
+// ══════════ EXPENSE SHEET ══════════
+function openSheet(id){
+  closeSheets(true);
+  $('ov').classList.add('open');$(id).classList.add('open');
+}
+function closeSheets(keepOv){
+  document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('open')});
+  if(!keepOv)$('ov').classList.remove('open');
+}
+function openExp(existing){
+  var cats=trip.categories.length?trip.categories:DEFAULT_CATS;
+  var curs=[mainCur()].concat(trip.currencies.filter(function(c){return c!==mainCur()}));
+  if(existing){
+    ex={edit:existing,amount:existing.amount,currency:existing.currency,name:existing.name,cat:existing.cat,
+        payer:existing.payer,split:null,pick:splitOf(existing,trip.travelers).slice(),day:existing.day,pay:existing.pay||'cash',note:existing.note||''};
+    var all=ex.pick.length===trip.travelers.length&&trip.travelers.every(function(t){return ex.pick.indexOf(t)>=0});
+    ex.split=all?'all':'pick';
   } else {
-    navigator.clipboard.writeText(link).then(function(){
-      toast('🔗 คัดลอก Link แล้ว! แชร์ใน LINE ได้เลย');
-    });
+    var last=null;try{last=localStorage.getItem('jodyub_me_'+trip.code)}catch(e){}
+    var defPayer=trip.mode==='pool'?'pool':(trip.travelers.indexOf(last)>=0?last:trip.travelers[0]);
+    ex={edit:null,amount:'',currency:curs[0],name:'',cat:cats[0],payer:defPayer,split:'all',pick:trip.travelers.slice(),day:todayKey(),pay:'cash',note:''};
+  }
+  $('ex-title').textContent=existing?'แก้ไขรายการ':'เพิ่มรายการ';
+  $('ex-amt').value=ex.amount;$('ex-name').value=ex.name;$('ex-note').value=ex.note;$('ex-pay').value=ex.pay;
+  $('ex-name').placeholder=PLACEHOLDER[mainCur()]||'ชื่อรายการ';
+  $('ex-day').innerHTML=buildDays().map(function(d){
+    var isToday=d.key===todayKey()&&todayIdx()!=null&&todayIdx()>=1;
+    return '<option value="'+d.key+'">'+(isToday?'วันนี้ · D'+d.n:'D'+d.n+(d.short?' · '+d.short:''))+'</option>';
+  }).join('');
+  $('ex-day').value=ex.day;
+  $('ex-curs').innerHTML=curs.length>1?curs.map(function(c){return '<button data-act="ex-cur" data-cur="'+c+'">'+(SYM[c]||'')+' '+c+'</button>'}).join(''):'';
+  $('ex-cats').innerHTML=cats.map(function(k){var c=catOf(k);return '<button class="ch" data-act="ex-cat" data-cat="'+esc(k)+'">'+c.e+' '+esc(c.l)+'</button>'}).join('');
+  $('ex-save').textContent=existing?'บันทึกการแก้ไข':'บันทึก';
+  $('ex-del').style.display=existing?'':'none';
+  fitAmt($('ex-amt'));exRender();openSheet('sh-exp');
+  if(!existing)setTimeout(function(){$('ex-amt').focus()},320);
+}
+function exRender(){
+  $('ex-sym').textContent=SYM[ex.currency]||ex.currency;
+  document.querySelectorAll('#ex-curs button').forEach(function(b){b.classList.toggle('on',b.dataset.cur===ex.currency)});
+  document.querySelectorAll('#ex-cats .ch').forEach(function(b){b.classList.toggle('on',b.dataset.cat===ex.cat)});
+  var payers=(usePool()?['pool']:[]).concat(trip.travelers);
+  if(payers.indexOf(ex.payer)<0)payers.push(ex.payer);
+  $('ex-payer').innerHTML=payers.map(function(p){
+    return '<button class="ch'+(p===ex.payer?' on':'')+'" data-act="ex-payer" data-p="'+esc(p)+'">'+(p==='pool'?'💰 กองกลาง':av(p,'mini-av')+esc(p))+'</button>';
+  }).join('');
+  $('ex-payer-hint').textContent=ex.payer==='pool'?'ตัดจากเงินกองกลาง':
+    (usePool()?ex.payer+' สำรองจ่ายไปก่อน คนที่ร่วมหารโอนคืนตอนจบ':ex.payer+' เป็นคนจ่าย');
+  document.querySelectorAll('#ex-split button').forEach(function(b){b.classList.toggle('on',b.dataset.s===ex.split)});
+  $('ex-pick').style.display=ex.split==='pick'?'flex':'none';
+  $('ex-pick').innerHTML=trip.travelers.map(function(n){
+    return '<button class="ch'+(ex.pick.indexOf(n)>=0?' on':'')+'" data-act="ex-pick" data-n="'+esc(n)+'">'+av(n,'mini-av')+esc(n)+'</button>';
+  }).join('');
+  exHints();exRefreshWarn();
+}
+function exSplitList(){return ex.split==='all'?trip.travelers.slice():trip.travelers.filter(function(n){return ex.pick.indexOf(n)>=0})}
+function exHints(){
+  var amt=+$('ex-amt').value||0,w=exSplitList(),hint;
+  if(!w.length)hint='เลือกอย่างน้อย 1 คน';
+  else if(isPersonalOnly(ex.payer,w))hint='🙅 รายการส่วนตัวไม่ต้องจดในทริป';
+  else{
+    var each=amt/w.length;
+    hint=(ex.split==='all'?'หารเท่ากันทุกคน':'หาร '+w.length+' คน')+(amt?' · คนละ '+fmt(each,ex.currency):'');
+    if(ex.payer!=='pool'&&w.indexOf(ex.payer)<0&&amt)hint+=' · '+ex.payer+' จ่ายแทนทั้งหมด';
+  }
+  $('ex-split-hint').textContent=hint;
+  $('ex-conv').textContent=amt&&ex.currency!==trip.baseCurrency?'≈ '+fmt(toBase(amt,ex.currency),trip.baseCurrency):'';
+}
+function exPoolShortfall(){
+  if(ex.payer!=='pool')return 0;
+  var amt=toBase(+$('ex-amt').value||0,ex.currency),left=bal().poolLeft;
+  if(ex.edit&&ex.edit.payer==='pool')left+=baseOf(ex.edit);
+  return amt>left+0.5?amt-left:0;
+}
+function exRefreshWarn(){
+  if(!ex)return;
+  var short=exPoolShortfall(),w=$('ex-pool-warn');
+  w.classList.toggle('show',short>0);
+  if(short>0){
+    var left=bal().poolLeft+(ex.edit&&ex.edit.payer==='pool'?baseOf(ex.edit):0);
+    $('ex-pool-warn-t').textContent='⚠️ กองเหลือ '+money(Math.max(0,left))+' ไม่พอจ่ายรายการนี้';
   }
 }
+function saveExp(){
+  var amount=parseFloat($('ex-amt').value),name=$('ex-name').value.trim(),w=exSplitList();
+  if(!(amount>0)){toast('⚠️ ใส่จำนวนเงินก่อน');$('ex-amt').focus();return}
+  if(!name){toast('⚠️ ใส่ชื่อรายการด้วย');$('ex-name').focus();return}
+  if(!w.length){toast('⚠️ เลือกคนที่ร่วมหารอย่างน้อย 1 คน');return}
+  if(isPersonalOnly(ex.payer,w)){toast('🙅 รายการส่วนตัวไม่ต้องจดในทริปนะ');return}
+  if(exPoolShortfall()>0){toast('⚠️ เงินกองไม่พอ เติมกองก่อน หรือให้คนสำรองจ่าย');exRefreshWarn();return}
+  var e;
+  if(ex.edit){e=Object.assign({},ex.edit)}
+  else{var key=db.ref(tripPath('expenses')).push().key;e={id:key,_key:key,ts:Date.now()}}
+  Object.assign(e,{day:$('ex-day').value,cat:ex.cat,name:name,amount:amount,currency:ex.currency,
+    note:$('ex-note').value.trim(),pay:$('ex-pay').value,payer:ex.payer,splitWith:w,
+    thb:toBase(amount,ex.currency)}); // thb เก็บไว้ให้เวอร์ชันเก่าอ่านได้ ไม่ใช้คำนวณ
+  if(ex.payer!=='pool'){try{localStorage.setItem('jodyub_me_'+trip.code,ex.payer)}catch(err){}}
+  if(ex.edit)expenses=expenses.map(function(x){return x===ex.edit?e:x});else expenses.push(e);
+  saveExpense(e).catch(function(){toast('❌ บันทึกไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต')});
+  var wasEdit=!!ex.edit;
+  closeSheets();renderAll();
+  toast(wasEdit?'✅ แก้ไขแล้ว':'✅ บันทึก "'+name+'" แล้ว');
+}
+function delExp(){
+  var e=ex.edit;if(!e)return;
+  expenses=expenses.filter(function(x){return x!==e});
+  deleteExpense(e);closeSheets();renderAll();
+  toast('🗑 ลบ "'+e.name+'" แล้ว',{label:'ย้อนกลับ',fn:function(){expenses.push(e);saveExpense(e);renderAll()}});
+}
 
-// ── Check URL trip on load ──
-checkURLTrip();
+// ══════════ TOP-UP SHEET ══════════
+function openTop(){
+  tp={mode:'all',member:trip.travelers[0]};
+  $('tp-amt').value='';$('tp-sym').textContent=SYM[mainCur()]||mainCur();
+  fitAmt($('tp-amt'));tpRender();openSheet('sh-top');setTimeout(function(){$('tp-amt').focus()},320);
+}
+function tpRender(){
+  document.querySelectorAll('#tp-mode button').forEach(function(b){b.classList.toggle('on',b.dataset.m===tp.mode)});
+  $('tp-one').style.display=tp.mode==='one'?'':'none';
+  $('tp-mem').innerHTML=trip.travelers.map(function(n){
+    return '<button class="ch'+(n===tp.member?' on':'')+'" data-act="tp-mem" data-n="'+esc(n)+'">'+av(n,'mini-av')+esc(n)+'</button>';
+  }).join('');
+  var a=+$('tp-amt').value||0,cur=mainCur();
+  $('tp-conv').textContent=!a?'':tp.mode==='all'?'รวม '+fmt(a*trip.travelers.length,cur)+' จาก '+trip.travelers.length+' คน':(cur!==trip.baseCurrency?'≈ '+fmt(toBase(a,cur),trip.baseCurrency):'');
+}
+function saveTop(){
+  var a=parseFloat($('tp-amt').value);
+  if(!(a>0)){toast('⚠️ ใส่จำนวนเงินก่อน');return}
+  var p=tp.mode==='all'?addContributionAll(a,mainCur(),todayKey()):addContribution(tp.member,a,mainCur(),todayKey());
+  p.catch(function(){toast('❌ บันทึกไม่สำเร็จ')});
+  closeSheets();
+  toast(tp.mode==='all'?'💰 เติมกองคนละ '+fmt(a,mainCur())+' แล้ว':'💰 '+tp.member+' เติมกอง '+fmt(a,mainCur())+' แล้ว');
+  // ถ้ามาจากฟอร์มรายการที่กองไม่พอ → เปิดฟอร์มเดิมต่อ
+  if(tp.resume){var keep=tp.resume;setTimeout(function(){reopenExp(keep)},400)}
+}
+function reopenExp(state){
+  openExp(state.edit);
+  Object.assign(ex,state);
+  $('ex-amt').value=state.amountTyped;fitAmt($('ex-amt'));$('ex-name').value=state.nameTyped;$('ex-note').value=state.noteTyped;
+  $('ex-day').value=state.dayTyped;$('ex-pay').value=state.payTyped;
+  exRender();
+}
+function snapshotEx(){
+  return Object.assign({},ex,{amountTyped:$('ex-amt').value,nameTyped:$('ex-name').value,noteTyped:$('ex-note').value,
+    dayTyped:$('ex-day').value,payTyped:$('ex-pay').value});
+}
+
+// ══════════ TRIP SETTINGS ACTIONS ══════════
+function addMember(){
+  var inp=$('t-mem-in'),n=inp.value.trim();
+  if(!n)return;
+  if(n==='pool'||trip.travelers.some(function(m){return m.toLowerCase()===n.toLowerCase()})){toast('⚠️ มีชื่อนี้แล้ว');return}
+  // รายการเก่าที่ไม่มี splitWith = "ทุกคน (ณ ตอนนั้น)" → ล็อกรายชื่อไว้ก่อน ไม่ให้คนใหม่โดนหาร
+  var updates={},old=trip.travelers.slice();
+  expenses.forEach(function(e){if(!e.splitWith||!arr(e.splitWith).length)updates['expenses/'+(e._key||e.id)+'/splitWith']=old});
+  updates.travelers=old.concat([n]);
+  db.ref(tripPath()).update(updates).then(function(){toast('👋 เพิ่ม '+n+' แล้ว')});
+  inp.value='';
+}
+function rmMember(n){
+  if(!confirm('ลบ '+n+' ออกจากทริป?'))return;
+  var updates={},old=trip.travelers.slice();
+  expenses.forEach(function(e){if(!e.splitWith||!arr(e.splitWith).length)updates['expenses/'+(e._key||e.id)+'/splitWith']=old});
+  updates.travelers=old.filter(function(m){return m!==n});
+  db.ref(tripPath()).update(updates);
+}
+function setTripCurrencies(list){
+  var main=list.indexOf(mainCur())>=0?mainCur():(list.filter(function(c){return c!==trip.baseCurrency})[0]||trip.baseCurrency);
+  db.ref(tripPath()).update({currencies:list,mainCurrency:main});
+}
+
+// ══════════ SHARE ══════════
+function shareLink(){return location.origin+location.pathname+'?trip='+trip.code}
+function shareTrip(){
+  if(!trip)return;
+  var link=shareLink();
+  if(navigator.share)navigator.share({title:'Jodyub — '+trip.name,text:'เข้าทริป '+trip.name+' บน Jodyub (โค้ด '+trip.code+')',url:link}).catch(function(){});
+  else copyText(link,'🔗 คัดลอกลิงก์แล้ว ส่งใน LINE ได้เลย');
+}
+
+// ══════════ EVENTS ══════════
+var ACT={
+  'new-trip':startSetup,
+  'join':function(el){openTrip($('join-input').value,el)},
+  'open-recent':function(el){openTrip(el.dataset.code)},
+  'rm-recent':function(el){setRecent(getRecent().filter(function(r){return r.code!==el.dataset.code}));renderRecent()},
+  'setup-back':function(){show('s-landing')},
+  'step-next':function(){if(stepValid())goStep(setup.step+1)},
+  'step-prev':function(){goStep(setup.step-1)},
+  's-add-mem':addSetupMember,
+  's-rm-mem':function(el){setup.members.splice(+el.dataset.i,1);renderSetupMembers()},
+  's-cur':function(el){
+    var c=el.dataset.cur,i=setup.currencies.indexOf(c);
+    if(c===setup.base)return;
+    if(i>=0)setup.currencies.splice(i,1);else setup.currencies.push(c);
+    renderSetupCurs();renderSetupRates();
+  },
+  's-mode':function(el){setup.mode=el.dataset.mode;renderSetupMode()},
+  's-cat':function(el){var k=el.dataset.cat,i=setup.extra.indexOf(k);if(i>=0)setup.extra.splice(i,1);else setup.extra.push(k);renderSetupCats()},
+  'create-trip':createTrip,
+  'view':function(el){view=el.dataset.view;renderAll();window.scrollTo(0,0)},
+  'toggle-cur':function(){showBase=!showBase;renderAll()},
+  'share':shareTrip,
+  'copy-code':function(){copyText(trip.code,'📋 คัดลอกโค้ด '+trip.code+' แล้ว')},
+  'copy-summary':function(){copyText(summaryText(),'📋 คัดลอกสรุปแล้ว วางใน LINE ได้เลย')},
+  'add-exp':function(){openExp(null)},
+  'edit-exp':function(el){var e=expenses.filter(function(x){return (x._key||x.id)===el.dataset.id})[0];if(e)openExp(e)},
+  'close-sheet':function(){closeSheets()},
+  'ex-cur':function(el){ex.currency=el.dataset.cur;exRender()},
+  'ex-cat':function(el){ex.cat=el.dataset.cat;exRender()},
+  'ex-payer':function(el){ex.payer=el.dataset.p;exRender()},
+  'ex-split':function(el){ex.split=el.dataset.s;if(ex.split==='pick'&&!ex.pick.length)ex.pick=trip.travelers.slice();exRender()},
+  'ex-pick':function(el){var n=el.dataset.n,i=ex.pick.indexOf(n);if(i>=0)ex.pick.splice(i,1);else ex.pick.push(n);exRender()},
+  'warn-member':function(){
+    var last=null;try{last=localStorage.getItem('jodyub_me_'+trip.code)}catch(e){}
+    ex.payer=trip.travelers.indexOf(last)>=0?last:trip.travelers[0];exRender();toast('เลือกคนที่สำรองจ่ายได้เลย');
+  },
+  'warn-topup':function(){var s=snapshotEx();openTop();tp.resume=s},
+  'save-exp':saveExp,
+  'del-exp':delExp,
+  'topup':openTop,
+  'tp-mode':function(el){tp.mode=el.dataset.m;tpRender()},
+  'tp-mem':function(el){tp.member=el.dataset.n;tpRender()},
+  'save-top':saveTop,
+  'del-contrib':function(el){
+    var c=contributions.filter(function(x){return (x._key||x.id)===el.dataset.id})[0];if(!c)return;
+    deleteContribution(c);
+    toast('🗑 ลบการเติมกองของ '+c.member+' แล้ว',{label:'ย้อนกลับ',fn:function(){saveContribution(c)}});
+  },
+  'filter-day':function(el){filterDay=el.dataset.day;renderList()},
+  'set-mode':function(el){
+    var m=el.dataset.mode;
+    db.ref(tripPath('mode')).set(m);
+    toast(m==='pool'?'💰 เปลี่ยนเป็นโหมดกองกลาง':'🤝 เปลี่ยนเป็นต่างคนต่างจ่าย');
+  },
+  'add-member':addMember,
+  'rm-member':function(el){rmMember(el.dataset.name)},
+  'live-rates':function(el){
+    el.disabled=true;el.textContent='⏳ กำลังดึงเรท...';
+    fetchLiveRates(trip.baseCurrency).then(function(live){
+      var upd={};foreignCurs().forEach(function(c){if(live[c])upd[c]=live[c]});
+      return db.ref(tripPath('rates')).update(upd).then(function(){toast('💱 อัปเดตเป็นเรทตลาดล่าสุดแล้ว')});
+    }).catch(function(){toast('❌ ดึงเรทไม่ได้ ลองใหม่อีกครั้ง')}).then(function(){el.disabled=false;el.textContent='ดึงเรทตลาดล่าสุด'});
+  },
+  't-cur':function(el){
+    var c=el.dataset.cur,list=trip.currencies.slice(),i=list.indexOf(c);
+    if(i>=0){
+      if(expenses.some(function(e){return e.currency===c})||contributions.some(function(x){return x.currency===c})){toast('⚠️ มีรายการที่ใช้ '+c+' อยู่ ลบไม่ได้');return}
+      list.splice(i,1);
+    } else list.push(c);
+    if(list.indexOf(trip.baseCurrency)<0)list.unshift(trip.baseCurrency);
+    setTripCurrencies(list);
+    if(i<0&&customRates[c]===undefined){
+      fetchLiveRates(trip.baseCurrency).then(function(live){if(live[c])db.ref(tripPath('rates/'+c)).set(live[c])}).catch(function(){});
+    }
+  },
+  't-main':function(el){db.ref(tripPath('mainCurrency')).set(el.dataset.cur)},
+  'save-info':function(){
+    var name=$('t-name').value.trim(),s=$('t-start').value,e=$('t-end').value;
+    if(!name){toast('⚠️ ชื่อทริปห้ามว่าง');return}
+    if(s&&e&&e<s){toast('⚠️ วันสุดท้ายต้องไม่ก่อนวันเริ่ม');return}
+    db.ref(tripPath()).update({name:name,destination:$('t-dest').value.trim(),dateStart:s,dateEnd:e}).then(function(){
+      trip.name=name;trip.destination=$('t-dest').value.trim();saveRecent();toast('✅ บันทึกแล้ว');
+    });
+  },
+  'leave':leaveTrip
+};
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-act]');
+  if(!el)return;
+  var fn=ACT[el.dataset.act];
+  if(!fn)return;
+  if(el.dataset.act==='open-recent'&&e.target.closest('[data-act="rm-recent"]'))return;
+  e.preventDefault();fn(el);
+});
+// inputs
+$('join-input').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')});
+$('join-input').addEventListener('keydown',function(e){if(e.key==='Enter')openTrip(this.value,$('btn-join'))});
+$('s-mem-in').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addSetupMember()}});
+$('s-base').addEventListener('change',function(){
+  setup.base=this.value;
+  if(setup.currencies.indexOf(setup.base)<0)setup.currencies.unshift(setup.base);
+  setup.rates={};setup.live=null;renderSetupCurs();renderSetupRates();
+  fetchLiveRates(setup.base).then(function(r){setup.live=r;setup.rates={};renderSetupRates()}).catch(function(){});
+});
+$('s-rates').addEventListener('input',function(e){var c=e.target.dataset.rate;if(c)setup.rates[c]=e.target.value});
+$('ex-amt').addEventListener('input',function(){fitAmt(this);exHints();exRefreshWarn()});
+$('ex-name').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();saveExp()}});
+$('tp-amt').addEventListener('input',function(){fitAmt(this);tpRender()});
+document.addEventListener('change',function(e){
+  var c=e.target.dataset&&e.target.dataset.tripRate;
+  if(!c)return;
+  var v=parseFloat(e.target.value);
+  if(!(v>0)){toast('⚠️ เรทไม่ถูกต้อง');renderTrip();return}
+  db.ref(tripPath('rates/'+c)).set(v);toast('💱 บันทึกเรท '+c+' แล้ว');
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')closeSheets();
+  if(e.key==='Enter'&&e.target.id==='t-mem-in'){e.preventDefault();addMember()}
+});
+
+// ══════════ BOOT ══════════
+window.shareTrip=shareTrip;
+renderRecent();
+(function(){
+  var code=new URLSearchParams(location.search).get('trip');
+  if(code){
+    history.replaceState({},'',location.pathname);
+    openTrip(code);
+  }
+})();
 
 }); // end DOMContentLoaded
 </script>
