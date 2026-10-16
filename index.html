@@ -214,8 +214,13 @@ input[type=date].f-in{color-scheme:dark;min-width:0;-webkit-appearance:none;appe
 /* ── sheets ── */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
 .ov.open{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);width:100%;max-width:460px;background:var(--s1);border-radius:24px 24px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));z-index:60;transition:transform .3s ease,visibility 0s linear .3s;visibility:hidden;max-height:92vh;overflow-y:auto;overscroll-behavior:contain}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);width:100%;max-width:460px;background:var(--s1);border-radius:24px 24px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));z-index:60;transition:transform .3s ease,visibility 0s linear .3s;visibility:hidden;max-height:92vh;max-height:calc(100dvh - env(safe-area-inset-top) - 12px);display:flex;flex-direction:column;overflow:hidden}
 .sheet.open{transform:translate(-50%,0);visibility:visible;transition:transform .3s ease}
+.sheet>.grab,.sheet>.sheet-t{flex:none}
+.sh-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin:0 -18px;padding:0 18px 8px}
+.sh-foot{flex:none;padding-top:12px;margin:0 -18px;padding-left:18px;padding-right:18px;border-top:1px solid var(--line)}
+.sh-foot .btn+.btn{margin-top:8px}
+body.sheet-lock{overflow:hidden}
 .grab{width:40px;height:4px;border-radius:4px;background:var(--s3);margin:0 auto 12px}
 .sheet-t{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .sheet-t h3{font-size:17px}
@@ -392,6 +397,7 @@ input[type=date].f-in{color-scheme:dark;min-width:0;-webkit-appearance:none;appe
 <div class="sheet" id="sh-exp" role="dialog" aria-label="รายการค่าใช้จ่าย">
   <div class="grab"></div>
   <div class="sheet-t"><h3 id="ex-title">เพิ่มรายการ</h3><button class="x" data-act="close-sheet" aria-label="ปิด">✕</button></div>
+  <div class="sh-body">
   <div class="amt-in"><span class="sym" id="ex-sym">¥</span><input id="ex-amt" type="number" inputmode="decimal" placeholder="0"></div>
   <div class="amt-cur" id="ex-curs"></div>
   <div class="amt-conv num" id="ex-conv"></div>
@@ -429,14 +435,17 @@ input[type=date].f-in{color-scheme:dark;min-width:0;-webkit-appearance:none;appe
   </div>
   <div class="f-l">หมายเหตุ (ไม่บังคับ)</div>
   <input class="f-in" id="ex-note" maxlength="100" placeholder="รายละเอียดเพิ่มเติม">
-
-  <button class="btn btn-lime" style="margin-top:20px" data-act="save-exp" id="ex-save">บันทึก</button>
-  <button class="btn btn-danger" style="margin-top:8px;display:none" data-act="del-exp" id="ex-del">🗑 ลบรายการนี้</button>
+  </div>
+  <div class="sh-foot">
+    <button class="btn btn-lime" data-act="save-exp" id="ex-save">บันทึก</button>
+    <button class="btn btn-danger" style="display:none" data-act="del-exp" id="ex-del">🗑 ลบรายการนี้</button>
+  </div>
 </div>
 
 <div class="sheet" id="sh-top" role="dialog" aria-label="เติมกองกลาง">
   <div class="grab"></div>
   <div class="sheet-t"><h3>💰 เติมกองกลาง</h3><button class="x" data-act="close-sheet" aria-label="ปิด">✕</button></div>
+  <div class="sh-body">
   <div class="seg" id="tp-mode" style="margin:6px 0 10px">
     <button data-act="tp-mode" data-m="all" class="on">ทุกคนเท่ากัน</button>
     <button data-act="tp-mode" data-m="one">รายคน</button>
@@ -447,7 +456,10 @@ input[type=date].f-in{color-scheme:dark;min-width:0;-webkit-appearance:none;appe
     <div class="f-l">ใครเติม</div>
     <div class="chips" id="tp-mem"></div>
   </div>
-  <button class="btn btn-lime" style="margin-top:20px" data-act="save-top">เติมเงิน</button>
+  </div>
+  <div class="sh-foot">
+    <button class="btn btn-lime" data-act="save-top">เติมเงิน</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"><span id="toast-t"></span><button id="toast-b" style="display:none"></button></div>
@@ -1134,12 +1146,15 @@ function renderTrip(){
 // ══════════ EXPENSE SHEET ══════════
 function openSheet(id){
   closeSheets(true);
+  var b=$(id).querySelector('.sh-body');if(b)b.scrollTop=0;
+  document.body.classList.add('sheet-lock');
   $('ov').classList.add('open');$(id).classList.add('open');
 }
 function closeSheets(keepOv){
   document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('open')});
-  if(!keepOv)$('ov').classList.remove('open');
+  if(!keepOv){$('ov').classList.remove('open');document.body.classList.remove('sheet-lock');}
 }
+function focusNoJump(el){try{el.focus({preventScroll:true})}catch(e){el.focus()}}
 function openExp(existing){
   var cats=trip.categories.length?trip.categories:DEFAULT_CATS;
   var curs=[mainCur()].concat(trip.currencies.filter(function(c){return c!==mainCur()}));
@@ -1166,7 +1181,7 @@ function openExp(existing){
   $('ex-save').textContent=existing?'บันทึกการแก้ไข':'บันทึก';
   $('ex-del').style.display=existing?'':'none';
   fitAmt($('ex-amt'));exRender();openSheet('sh-exp');
-  if(!existing)setTimeout(function(){$('ex-amt').focus()},320);
+  if(!existing)setTimeout(function(){focusNoJump($('ex-amt'))},320);
 }
 function exRender(){
   $('ex-sym').textContent=SYM[ex.currency]||ex.currency;
@@ -1245,7 +1260,7 @@ function delExp(){
 function openTop(){
   tp={mode:'all',member:trip.travelers[0]};
   $('tp-amt').value='';$('tp-sym').textContent=SYM[mainCur()]||mainCur();
-  fitAmt($('tp-amt'));tpRender();openSheet('sh-top');setTimeout(function(){$('tp-amt').focus()},320);
+  fitAmt($('tp-amt'));tpRender();openSheet('sh-top');setTimeout(function(){focusNoJump($('tp-amt'))},320);
 }
 function tpRender(){
   document.querySelectorAll('#tp-mode button').forEach(function(b){b.classList.toggle('on',b.dataset.m===tp.mode)});
